@@ -73,6 +73,7 @@ function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
   @test !any(isnan(spectrogram))
 
   # Aperiodicity ratio estimation
+  # some bugs?
   aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
   @test !any(isnan(aperiodicity))
 
@@ -97,14 +98,17 @@ x, fs = wavread(fpath)
 # arayuru.wav is a monoral wav file
 x = x[:] # Array{Float64,2} -> Array{Float64,1}
 
-# Test WORLD speech decomposition and re-synthesis
-for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
-  testworld(fs=fs, period=p, eps=e)
-  testworld(fs=fs, period=p, useCheaptrick=true, eps=e)
-end
-
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
   testworldAperiodicity(fs=fs, period=p, eps=e)
   testworldAperiodicity(fs=fs, period=p, useCheaptrick=true, eps=e)
+end
+
+info("aperiodicity based decomposition and synthesis tests passed.")
+
+# Test WORLD speech decomposition and re-synthesis
+# probably fail
+for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
+  testworld(fs=fs, period=p, eps=e)
+  testworld(fs=fs, period=p, useCheaptrick=true, eps=e)
 end
