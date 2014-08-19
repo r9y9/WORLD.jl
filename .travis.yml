@@ -5,7 +5,8 @@ notifications:
   email: false
 env:
   matrix:
-    - JULIAVERSION="juliareleases"
+# skip v0.2
+#    - JULIAVERSION="juliareleases"
     - JULIAVERSION="julianightlies"
 before_install:
   - sudo add-apt-repository ppa:staticfloat/julia-deps -y
@@ -14,4 +15,4 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
-  - julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.test("WORLD")'
+  - julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.build("WORLD"); Pkg.test("WORLD")'
