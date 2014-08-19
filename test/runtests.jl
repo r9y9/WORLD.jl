@@ -4,6 +4,8 @@ using WAV
 
 # speech -> {f0, envelope, residual} -> speech
 function testworld(;useCheaptrick=false, fs=44100, period=5.0, eps=0.1)
+  info("fs=$(fs), period=$(period), eps=$(eps)")
+
   w = World(fs=fs, framePeriod=period)
 
   # Fundamental frequency (f0) estimation by DIO
@@ -38,12 +40,16 @@ function testworld(;useCheaptrick=false, fs=44100, period=5.0, eps=0.1)
 
   errorrate = mean(abs(y-x)) / maxabs(x)
 
+  info("errorrate=$(errorrate)")
+
   @test errorrate < eps
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
 function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
                                eps=0.1)
+  info("fs=$(fs), period=$(period), eps=$(eps)")
+
   w = World(fs=fs, framePeriod=period)
 
   # Fundamental frequency (f0) estimation by DIO
@@ -77,6 +83,8 @@ function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
   @test length(y) == length(x)
 
   errorrate = mean(abs(y-x)) / maxabs(x)
+
+  info("errorrate=$(errorrate)")
 
   @test errorrate < eps
 end
