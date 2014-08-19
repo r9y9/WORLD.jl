@@ -191,7 +191,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
 end
 
 function synthesisFromAperiodicity(f0::Vector{Float64},
-                                   spectrogram::MatrixFloat64},
+                                   spectrogram::Matrix{Float64},
                                    aperiodicity::Matrix{Float64},
                                    framePeriod::Float64,
                                    fs::Int, len::Int)
