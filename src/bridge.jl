@@ -122,7 +122,7 @@ end
 
 function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                   f0::Vector{Float64},
-                  spectrogram::Array{Float64,2})
+                  spectrogram::Matrix{Float64})
     fftsize::Int = getFFTSizeForCheapTrick(fs)
     freqbins = fftsize+1
     residual = zeros(length(f0), freqbins)
@@ -146,8 +146,8 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     return residual
 end
 
-function synthesis(f0::Vector{Float64}, spectrogram::Array{Float64,2},
-                   residual::Array{Float64,2},
+function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
+                   residual::Matrix{Float64},
                    framePeriod::Float64, fs::Int, len::Int)
     fftsize::Int = getFFTSizeForCheapTrick(fs)
 
@@ -191,8 +191,8 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
 end
 
 function synthesisFromAperiodicity(f0::Vector{Float64},
-                                   spectrogram::Array{Float64,2},
-                                   aperiodicity::Array{Float64,2},
+                                   spectrogram::MatrixFloat64},
+                                   aperiodicity::Matrix{Float64},
                                    framePeriod::Float64,
                                    fs::Int, len::Int)
     fftsize::Int = getFFTSizeForCheapTrick(fs)
