@@ -98,13 +98,13 @@ x, fs = wavread(fpath)
 x = x[:] # Array{Float64,2} -> Array{Float64,1}
 
 # Test WORLD speech decomposition and re-synthesis
-for (p, e) in ([5.0, 0.1], [7.0, 0.15], [10.0, 0.16])
+for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
   testworld(fs=fs, period=p, eps=e)
   testworld(fs=fs, period=p, useCheaptrick=true, eps=e)
 end
 
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
-for (p, e) in ([5.0, 0.135], [7.0, 0.16], [10.0, 0.16])
+for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
   testworldAperiodicity(fs=fs, period=p, eps=e)
   testworldAperiodicity(fs=fs, period=p, useCheaptrick=true, eps=e)
 end
