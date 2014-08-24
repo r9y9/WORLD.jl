@@ -3,10 +3,10 @@ using Base.Test
 using WAV
 
 # speech -> {f0, envelope, residual} -> speech
-function testworld(;useCheaptrick=false, fs=44100, period=5.0, eps=0.1)
+function testworld(;use_cheaptrick=false, fs=44100, period=5.0, eps=0.1)
   info("fs=$(fs), period=$(period), eps=$(eps)")
 
-  w = World(fs=fs, framePeriod=period)
+  w = World(fs=fs, period=period)
 
   # Fundamental frequency (f0) estimation by DIO
   f0, timeaxis = dio1(w, x)
@@ -19,7 +19,7 @@ function testworld(;useCheaptrick=false, fs=44100, period=5.0, eps=0.1)
 
   # Spectral envelope estimation
   spectrogram = Matrix{Float64}
-  if useCheaptrick
+  if use_cheaptrick
     # CheapTrick
     spectrogram = cheaptrick(w, x, timeaxis, f0)
   else
@@ -46,11 +46,11 @@ function testworld(;useCheaptrick=false, fs=44100, period=5.0, eps=0.1)
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
-function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
+function testworld_aperiodicity(;use_cheaptrick=false, fs=44100, period=5.0,
                                eps=0.1)
   info("fs=$(fs), period=$(period), eps=$(eps)")
 
-  w = World(fs=fs, framePeriod=period)
+  w = World(fs=fs, period=period)
 
   # Fundamental frequency (f0) estimation by DIO
   f0, timeaxis = dio1(w, x)
@@ -63,7 +63,7 @@ function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
 
   # Spectral envelope estimation
   spectrogram = Matrix{Float64}
-  if useCheaptrick
+  if use_cheaptrick
     # CheapTrick
     spectrogram = cheaptrick(w, x, timeaxis, f0)
   else
@@ -78,7 +78,7 @@ function testworldAperiodicity(;useCheaptrick=false, fs=44100, period=5.0,
   @test !any(isnan(aperiodicity))
 
   # Sysnthesis from f0, spectral envelope and aperiodicity ratio.
-  y = synthesisFromAperiodicity(w, f0, spectrogram, aperiodicity, length(x))
+  y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
   @test !any(isnan(y))
 
   @test length(y) == length(x)
@@ -100,8 +100,8 @@ x = x[:] # Array{Float64,2} -> Array{Float64,1}
 
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
-  testworldAperiodicity(fs=fs, period=p, eps=e)
-  testworldAperiodicity(fs=fs, period=p, useCheaptrick=true, eps=e)
+  testworld_aperiodicity(fs=fs, period=p, eps=e)
+  testworld_aperiodicity(fs=fs, period=p, use_cheaptrick=true, eps=e)
 end
 
 info("aperiodicity based decomposition and synthesis tests passed.")
@@ -110,5 +110,5 @@ info("aperiodicity based decomposition and synthesis tests passed.")
 # probably fail
 for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
   testworld(fs=fs, period=p, eps=e)
-  testworld(fs=fs, period=p, useCheaptrick=true, eps=e)
+  testworld(fs=fs, period=p, use_cheaptrick=true, eps=e)
 end
