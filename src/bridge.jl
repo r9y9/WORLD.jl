@@ -68,13 +68,13 @@ end
 
 # Array{T,2} -> Array{Ptr{T}}
 function make_2dcarray_alternative{T<:Real}(a::Array{T,2})
-    [pointer(a[i,:],1) for i=1:size(a,1)]
+    [pointer(a[:,i],1) for i=1:size(a,2)]
 end
 
 function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
               f0::Vector{Float64})
     freqbins = int(get_fftsize_for_star(fs)/2+1)
-    spectrogram = zeros(length(f0), freqbins)
+    spectrogram = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -87,7 +87,7 @@ function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        spectrogram[i,:] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
+        spectrogram[:,i] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
     end
 
     return spectrogram
@@ -101,7 +101,7 @@ end
 function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                     f0::Vector{Float64})
     freqbins = int(get_fftsize_for_cheaptrick(fs)/2+1)
-    spectrogram = zeros(length(f0), freqbins)
+    spectrogram = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -114,7 +114,7 @@ function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        spectrogram[i,:] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
+        spectrogram[:,i] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
     end
 
     return spectrogram
@@ -125,7 +125,7 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                   spectrogram::Matrix{Float64})
     fftsize::Int = get_fftsize_for_cheaptrick(fs)
     freqbins = fftsize+1
-    residual = zeros(length(f0), freqbins)
+    residual = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -140,7 +140,7 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        residual[i,:] = pointer_to_array(residual_passed_to_C[i], freqbins)
+        residual[:,i] = pointer_to_array(residual_passed_to_C[i], freqbins)
     end
 
     return residual
@@ -169,7 +169,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
                            timeaxis::Vector{Float64})
     fftsize::Int = get_fftsize_for_cheaptrick(fs)
     freqbins = int(fftsize/2+1)
-    aperiodicity = zeros(length(f0), freqbins)
+    aperiodicity = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     aperiodicity_passed_to_C = make_2dcarray_alternative(aperiodicity)
@@ -183,7 +183,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        aperiodicity[i,:] =
+        aperiodicity[:,i] =
         pointer_to_array(aperiodicity_passed_to_C[i], freqbins)
     end
 
