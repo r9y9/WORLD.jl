@@ -13,7 +13,7 @@ provides(Sources,
          world,
          unpacked_dir="world-v.$(version)")
 
-prefix=joinpath(BinDeps.depsdir(world), "usr")
+prefix = joinpath(BinDeps.depsdir(world), "usr")
 srcdir = joinpath(BinDeps.depsdir(world), "src", "world-v.$(version)")
 
 provides(SimpleBuild,
