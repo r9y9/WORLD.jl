@@ -6,14 +6,12 @@ immutable DioOption
     channelsInOctave::Cdouble
     period::Cdouble # ms
     speed::Cint
-end
 
-function DioOption(f0Floor::Float64, f0Ceil::Float64,
-                   channelsInOctave::Float64,
-                   period::Float64, speed::Int32)
-    DioOption(convert(Cdouble, f0Floor), convert(Cdouble, f0Ceil),
-              convert(Cdouble, channelsInOctave),
-              convert(Cdouble, period), convert(Cint, speed))
+    function DioOption(f0Floor, f0Ceil, channelsInOctave, period, speed)
+        new(convert(Cdouble, f0Floor), convert(Cdouble, f0Ceil),
+            convert(Cdouble, channelsInOctave),
+            convert(Cdouble, period), convert(Cint, speed))
+    end
 end
 
 function get_samples_for_dio(fs::Int, len::Int, period::Float64)
