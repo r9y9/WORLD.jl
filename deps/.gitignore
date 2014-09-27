@@ -1,4 +1,3 @@
-deps.jl
-downloads
-src
-usr
+*
+!build.jl
+!.gitignore
