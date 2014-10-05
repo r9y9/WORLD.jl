@@ -71,7 +71,7 @@ end
 
 function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
               f0::Vector{Float64})
-    freqbins = int(get_fftsize_for_star(fs)/2+1)
+    const freqbins = div(get_fftsize_for_star(fs), 2) + 1
     spectrogram = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -98,7 +98,7 @@ end
 
 function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                     f0::Vector{Float64})
-    freqbins = int(get_fftsize_for_cheaptrick(fs)/2+1)
+    const freqbins = div(get_fftsize_for_cheaptrick(fs), 2) + 1
     spectrogram = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -121,8 +121,8 @@ end
 function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                   f0::Vector{Float64},
                   spectrogram::Matrix{Float64})
-    fftsize::Int = get_fftsize_for_cheaptrick(fs)
-    freqbins = fftsize+1
+    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    const freqbins = fftsize +1
     residual = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -147,7 +147,7 @@ end
 function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
                    residual::Matrix{Float64},
                    period::Float64, fs::Int, len::Int)
-    fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -165,8 +165,8 @@ end
 
 function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
                            timeaxis::Vector{Float64})
-    fftsize::Int = get_fftsize_for_cheaptrick(fs)
-    freqbins = int(fftsize/2+1)
+    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    const freqbins = div(fftsize, 2) + 1
     aperiodicity = zeros(freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -193,7 +193,7 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
                                    aperiodicity::Matrix{Float64},
                                    period::Float64,
                                    fs::Int, len::Int)
-    fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
