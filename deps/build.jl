@@ -6,15 +6,15 @@ deps = [
         world = library_dependency("libworld")
         ]
 
-const version = "0.1.4_1"
+const version = "0.1.4_2"
 
 provides(Sources,
-         URI("https://github.com/r9y9/world/archive/v.$(version).tar.gz"),
+         URI("https://github.com/r9y9/world/archive/v$(version).tar.gz"),
          world,
          unpacked_dir="world-v.$(version)")
 
 prefix = joinpath(BinDeps.depsdir(world), "usr")
-srcdir = joinpath(BinDeps.depsdir(world), "src", "world-v.$(version)")
+srcdir = joinpath(BinDeps.depsdir(world), "src", "world-v$(version)")
 
 provides(SimpleBuild,
           (@build_steps begin
