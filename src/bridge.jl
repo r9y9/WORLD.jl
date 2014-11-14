@@ -195,10 +195,10 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
 end
 
 function synthesis_from_aperiodicity(f0::Vector{Float64},
-                                   spectrogram::Matrix{Float64},
-                                   aperiodicity::Matrix{Float64},
-                                   period::Float64,
-                                   fs::Int, len::Int)
+                                     spectrogram::Matrix{Float64},
+                                     aperiodicity::Matrix{Float64},
+                                     period::Float64,
+                                     fs::Int, len::Int)
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
