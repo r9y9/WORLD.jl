@@ -38,8 +38,8 @@ end
 function dio1(x::Vector{Float64}, fs::Int, period::Float64)
     expectedlen = get_samples_for_dio(fs, length(x), period)
 
-    f0 = zeros(expectedlen)
-    timeaxis = zeros(expectedlen)
+    f0 = Array(Float64, expectedlen)
+    timeaxis = Array(Float64, expectedlen)
     ccall((:DioOld, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, Float64, Ptr{Float64}, Ptr{Float64}),
           x, length(x), fs, period, timeaxis, f0)
@@ -52,7 +52,7 @@ end
 
 function stonemask(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                    f0::Vector{Float64})
-    refinedF0 = zeros(length(f0))
+    refinedF0 = Array(Float64, length(f0))
     ccall((:StoneMask, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int,
            Ptr{Float64}),
@@ -72,7 +72,7 @@ end
 function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
               f0::Vector{Float64})
     const freqbins = div(get_fftsize_for_star(fs), 2) + 1
-    spectrogram = zeros(freqbins, length(f0))
+    spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -99,7 +99,7 @@ end
 function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                     f0::Vector{Float64})
     const freqbins = div(get_fftsize_for_cheaptrick(fs), 2) + 1
-    spectrogram = zeros(freqbins, length(f0))
+    spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -123,7 +123,7 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                   spectrogram::Matrix{Float64})
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
     const freqbins = fftsize +1
-    residual = zeros(freqbins, length(f0))
+    residual = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
@@ -153,7 +153,7 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
     residual_passed_to_C = make_2dcarray_alternative(residual)
 
-    synthesized = zeros(len)
+    synthesized = Array(Float64, len)
     ccall((:Synthesis, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
@@ -167,7 +167,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
                            timeaxis::Vector{Float64})
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
     const freqbins = div(fftsize, 2) + 1
-    aperiodicity = zeros(freqbins, length(f0))
+    aperiodicity = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     aperiodicity_passed_to_C = make_2dcarray_alternative(aperiodicity)
@@ -199,7 +199,7 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
     spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
     aperiodicity_passed_to_C = make_2dcarray_alternative(aperiodicity)
 
-    synthesized = zeros(len)
+    synthesized = Array(Float64, len)
     ccall((:SynthesisFromAperiodicity, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
