@@ -137,8 +137,8 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     ccall((:Platinum, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}, Int64, Ptr{Ptr{Float64}}),
-          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram,
-          fftsize, cresidual)
+          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram, fftsize,
+          cresidual)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
@@ -164,8 +164,8 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
     ccall((:Synthesis, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
-          f0, length(f0), cspectrogram, cresidual,
-          fftsize, period, fs, len, synthesized)
+          f0, length(f0), cspectrogram, cresidual, fftsize, period, fs, len, 
+          synthesized)
 
     return synthesized
 end
@@ -183,8 +183,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
     ccall((:AperiodicityRatio, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Int, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}),
-          x, length(x), fs, f0, length(f0), timeaxis, fftsize,
-          caperiodicity)
+          x, length(x), fs, f0, length(f0), timeaxis, fftsize, caperiodicity)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
@@ -212,8 +211,8 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
     ccall((:SynthesisFromAperiodicity, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
-          f0, length(f0), cspectrogram, caperiodicity,
-          fftsize, period, fs, len, synthesized)
+          f0, length(f0), cspectrogram, caperiodicity, fftsize, period, fs,
+          len, synthesized)
 
     return synthesized
 end
