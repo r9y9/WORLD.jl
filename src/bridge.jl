@@ -65,7 +65,7 @@ function get_fftsize_for_star(fs::Int)
 end
 
 # Array{T,2} -> Array{Ptr{T}}
-function make_2dcarray_alternative{T<:Real}(a::Array{T,2})
+function ptrarray2d{T<:Real}(a::Array{T,2})
     [pointer(a[:,i],1) for i=1:size(a,2)]
 end
 
@@ -75,17 +75,17 @@ function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
+    cspectrogram = ptrarray2d(spectrogram)
 
     ccall((:Star, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}),
-          x, length(x), fs, timeaxis, f0, length(f0), spectrogram_passed_to_C)
+          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
 
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        spectrogram[:,i] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
+        spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
     end
 
     return spectrogram
@@ -102,17 +102,17 @@ function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
+    cspectrogram = ptrarray2d(spectrogram)
 
     ccall((:CheapTrick, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}),
-          x, length(x), fs, timeaxis, f0, length(f0), spectrogram_passed_to_C)
+          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
 
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        spectrogram[:,i] = pointer_to_array(spectrogram_passed_to_C[i], freqbins)
+        spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
     end
 
     return spectrogram
@@ -126,19 +126,19 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     residual = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
-    residual_passed_to_C = make_2dcarray_alternative(residual)
+    cspectrogram = ptrarray2d(spectrogram)
+    cresidual = ptrarray2d(residual)
 
     ccall((:Platinum, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}, Int64, Ptr{Ptr{Float64}}),
-          x, length(x), fs, timeaxis, f0, length(f0), spectrogram_passed_to_C,
-          fftsize, residual_passed_to_C)
+          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram,
+          fftsize, cresidual)
 
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
-        residual[:,i] = pointer_to_array(residual_passed_to_C[i], freqbins)
+        residual[:,i] = pointer_to_array(cresidual[i], freqbins)
     end
 
     return residual
@@ -150,14 +150,14 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
-    residual_passed_to_C = make_2dcarray_alternative(residual)
+    cspectrogram = ptrarray2d(spectrogram)
+    cresidual = ptrarray2d(residual)
 
     synthesized = Array(Float64, len)
     ccall((:Synthesis, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
-          f0, length(f0), spectrogram_passed_to_C, residual_passed_to_C,
+          f0, length(f0), cspectrogram, cresidual,
           fftsize, period, fs, len, synthesized)
 
     return synthesized
@@ -170,19 +170,19 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
     aperiodicity = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    aperiodicity_passed_to_C = make_2dcarray_alternative(aperiodicity)
+    caperiodicity = ptrarray2d(aperiodicity)
 
     ccall((:AperiodicityRatio, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Int, Ptr{Float64}, Int64,
            Ptr{Ptr{Float64}}),
           x, length(x), fs, f0, length(f0), timeaxis, fftsize,
-          aperiodicity_passed_to_C)
+          caperiodicity)
 
     # TODO (ryuichi) Better solution
     # Array{Float64,2} <- Array{Ptr{Float64}}
     for i=1:length(f0)
         aperiodicity[:,i] =
-        pointer_to_array(aperiodicity_passed_to_C[i], freqbins)
+        pointer_to_array(caperiodicity[i], freqbins)
     end
 
     return aperiodicity
@@ -196,14 +196,14 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
-    spectrogram_passed_to_C = make_2dcarray_alternative(spectrogram)
-    aperiodicity_passed_to_C = make_2dcarray_alternative(aperiodicity)
+    cspectrogram = ptrarray2d(spectrogram)
+    caperiodicity = ptrarray2d(aperiodicity)
 
     synthesized = Array(Float64, len)
     ccall((:SynthesisFromAperiodicity, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
-          f0, length(f0), spectrogram_passed_to_C, aperiodicity_passed_to_C,
+          f0, length(f0), cspectrogram, caperiodicity,
           fftsize, period, fs, len, synthesized)
 
     return synthesized
