@@ -26,12 +26,12 @@ include("bridge.jl")
 
 # World is a composite type that holds common settings that are used during
 # analysis
-type World
+immutable World
     fs::Int64       # Sample frequency
     period::Float64 # Frame period [ms]
 end
 
-World(;fs=44100, period=5.0) = World(fs, period)
+World(;fs::Real=44100, period::Float64=5.0) = World(fs, period)
 
 function dio1(w::World, x::Vector{Float64})
     dio1(x, w.fs, w.period)
