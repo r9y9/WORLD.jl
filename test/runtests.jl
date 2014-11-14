@@ -3,7 +3,9 @@ using Base.Test
 using WAV
 
 # speech -> {f0, envelope, residual} -> speech
-function testworld(;use_cheaptrick=false, fs=44100, period=5.0, eps=0.1)
+function testworld(x::AbstractArray, fs::Int=44100, period::Float64=5.0;
+                   eps::Float64=0.1,
+                   use_cheaptrick::Bool=false)
   info("fs=$(fs), period=$(period), eps=$(eps)")
 
   w = World(fs=fs, period=period)
@@ -18,12 +20,10 @@ function testworld(;use_cheaptrick=false, fs=44100, period=5.0, eps=0.1)
   @test !any(isnan(f0))
 
   # Spectral envelope estimation
-  spectrogram = Matrix{Float64}
+  spectrogram = zeros(0,0)
   if use_cheaptrick
-    # CheapTrick
     spectrogram = cheaptrick(w, x, timeaxis, f0)
   else
-    # Star
     spectrogram = star(w, x, timeaxis, f0)
   end
   @test !any(isnan(spectrogram))
@@ -46,8 +46,10 @@ function testworld(;use_cheaptrick=false, fs=44100, period=5.0, eps=0.1)
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
-function testworld_aperiodicity(;use_cheaptrick=false, fs=44100, period=5.0,
-                               eps=0.1)
+function testworld_aperiodicity(x::AbstractArray, fs::Int=44100,
+                                period::Float64=5.0;
+                                eps::Float64=0.1,
+                                use_cheaptrick::Bool=false)
   info("fs=$(fs), period=$(period), eps=$(eps)")
 
   w = World(fs=fs, period=period)
@@ -62,12 +64,10 @@ function testworld_aperiodicity(;use_cheaptrick=false, fs=44100, period=5.0,
   @test !any(isnan(f0))
 
   # Spectral envelope estimation
-  spectrogram = Matrix{Float64}
+  spectrogram = zeros(0,0)
   if use_cheaptrick
-    # CheapTrick
     spectrogram = cheaptrick(w, x, timeaxis, f0)
   else
-    # Star
     spectrogram = star(w, x, timeaxis, f0)
   end
   @test !any(isnan(spectrogram))
@@ -93,15 +93,15 @@ end
 # Read test data (male)
 fpath = joinpath(Pkg.dir("WORLD"), "test", "data", "arayuru.wav")
 x, fs = wavread(fpath)
-@test !any(isnan(x))
-
-# arayuru.wav is a monoral wav file
-x = x[:] # Array{Float64,2} -> Array{Float64,1}
+@assert size(x, 2) == 1 "The input data must be monoral."
+@assert !any(isnan(x))
+x = vec(x)
+fs = int(fs)
 
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
-  testworld_aperiodicity(fs=fs, period=p, eps=e)
-  testworld_aperiodicity(fs=fs, period=p, use_cheaptrick=true, eps=e)
+  testworld_aperiodicity(x, fs, p; eps=e)
+  testworld_aperiodicity(x, fs, p; use_cheaptrick=true, eps=e)
 end
 
 info("aperiodicity based decomposition and synthesis tests passed.")
@@ -109,6 +109,6 @@ info("aperiodicity based decomposition and synthesis tests passed.")
 # Test WORLD speech decomposition and re-synthesis
 # probably fail
 for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
-  testworld(fs=fs, period=p, eps=e)
-  testworld(fs=fs, period=p, use_cheaptrick=true, eps=e)
+  testworld(x, fs, p; eps=e)
+  testworld(x, fs, p; use_cheaptrick=true, eps=e)
 end
