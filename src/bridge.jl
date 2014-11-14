@@ -26,8 +26,8 @@ function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
     println(opt)
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
 
-    f0 = zeros(expectedlen)
-    timeaxis = zeros(expectedlen)
+    f0 = Array(Float64, expectedlen)
+    timeaxis = Array(Float64, expectedlen)
     ccall((:Dio, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, DioOption, Ptr{Float64}, Ptr{Float64}),
           x, length(x), fs, opt, timeaxis, f0)
