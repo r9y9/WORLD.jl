@@ -101,7 +101,10 @@ fs = int(fs)
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
     testworld_aperiodicity(x, fs, p; eps=e)
+    # TODO fix: some memory leak or double free?
+    gc()
     testworld_aperiodicity(x, fs, p; use_cheaptrick=true, eps=e)
+    gc()
 end
 
 info("aperiodicity based decomposition and synthesis tests passed.")
@@ -110,5 +113,7 @@ info("aperiodicity based decomposition and synthesis tests passed.")
 # probably fail
 for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
     testworld(x, fs, p; eps=e)
+    gc()
     testworld(x, fs, p; use_cheaptrick=true, eps=e)
+    gc()
 end
