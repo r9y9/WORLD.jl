@@ -10,8 +10,10 @@ function testworld(x::AbstractArray, fs::Int=44100, period::Float64=5.0;
 
     w = World(fs=fs, period=period)
 
+    opt = DioOption(80.0, 640.0, 2, 5.0, 4)
+
     # Fundamental frequency (f0) estimation by DIO
-    f0, timeaxis = dio1(w, x)
+    f0, timeaxis = dio(w, x; opt=opt)
     @test !any(isnan(f0))
     @test !any(isnan(timeaxis))
 
@@ -53,9 +55,10 @@ function testworld_aperiodicity(x::AbstractArray, fs::Int=44100,
     info("fs=$(fs), period=$(period), eps=$(eps)")
 
     w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, 5.0, 4)
 
     # Fundamental frequency (f0) estimation by DIO
-    f0, timeaxis = dio1(w, x)
+    f0, timeaxis = dio(w, x; opt=opt)
     @test !any(isnan(f0))
     @test !any(isnan(timeaxis))
 

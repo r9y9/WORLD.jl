@@ -31,7 +31,13 @@ immutable World
     period::Float64 # Frame period [ms]
 end
 
+const defaultdioopt = DioOption(80.0, 640.0, 2.0, 5.0, 4)
+
 World(;fs::Real=44100, period::Float64=5.0) = World(fs, period)
+
+function dio(w::World, x::Vector{Float64}; opt::DioOption=defaultdioopt)
+    dio(x, w.fs, opt)
+end
 
 function dio1(w::World, x::Vector{Float64})
     dio1(x, w.fs, w.period)

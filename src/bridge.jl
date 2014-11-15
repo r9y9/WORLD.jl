@@ -1,16 +1,18 @@
 @assert isdefined(:libworld)
 
 immutable DioOption
-    f0Floor::Cdouble
-    f0Ceil::Cdouble
-    channelsInOctave::Cdouble
-    period::Cdouble # ms
-    speed::Cint
+    f0floor::Float64
+    f0ceil::Float64
+    channels_in_octave::Float64
+    period::Float64 # ms
+    speed::Int
 
-    function DioOption(f0Floor, f0Ceil, channelsInOctave, period, speed)
-        new(convert(Cdouble, f0Floor), convert(Cdouble, f0Ceil),
-            convert(Cdouble, channelsInOctave),
-            convert(Cdouble, period), convert(Cint, speed))
+    function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
+        new(convert(Float64, f0floor),
+            convert(Float64, f0ceil),
+            convert(Float64, channels_in_octave),
+            convert(Float64, period),
+            convert(Int, speed))
     end
 end
 
@@ -19,18 +21,14 @@ function get_samples_for_dio(fs::Int, len::Int, period::Float64)
                  (Int, Int, Float64), fs, len, period)
 end
 
-# This function doesn't work because currently julia doesn't support
-# conversions between Julia types and C-struct.
-# TODO(ryuichi) solution
 function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
-    println(opt)
-    expectedlen = get_samples_for_dio(fs, length(x), opt.period)
-
+    const expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array(Float64, expectedlen)
     timeaxis = Array(Float64, expectedlen)
-    ccall((:Dio, libworld),  Void,
-          (Ptr{Float64}, Int64, Int64, DioOption, Ptr{Float64}, Ptr{Float64}),
-          x, length(x), fs, opt, timeaxis, f0)
+    # Note that value passinig of julia-type to C-struct doesn't work.
+    ccall((:DioByOptPtr, libworld),  Void,
+          (Ptr{Float64}, Int64, Int64, Ptr{DioOption}, Ptr{Float64}, Ptr{Float64}),
+          x, length(x), fs, &opt, timeaxis, f0)
     return f0, timeaxis
 end
 
