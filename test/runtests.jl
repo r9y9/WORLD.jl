@@ -164,13 +164,13 @@ x, fs = wavread(fpath)
 x = vec(x)
 fs = int(fs)
 
-for p in [5.0, 7.0, 10.0]
-    test_dio(x, fs, p)
-    test_dio1(x, fs, p)
-    test_stonemask(x, fs, p)
-    test_cheaptrick(x, fs, p)
-    test_star(x, fs, p)
-    test_aperiodicity(x, fs, p)
+for period in [5.0, 7.0, 10.0]
+    test_dio(x, fs, period)
+    test_dio1(x, fs, period)
+    test_stonemask(x, fs, period)
+    test_cheaptrick(x, fs, period)
+    test_star(x, fs, period)
+    test_aperiodicity(x, fs, period)
     gc()
 end
 
