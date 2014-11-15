@@ -3,6 +3,7 @@ using Base.Test
 using WAV
 
 function test_dio(x, fs::Int=44100, period::Float64=5.0)
+    info("test_dio: fs=$(fs), period=$(period)")
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
     f0, timeaxis = dio(w, x; opt=opt)
@@ -11,6 +12,7 @@ function test_dio(x, fs::Int=44100, period::Float64=5.0)
 end
 
 function test_dio1(x, fs::Int=44100, period::Float64=5.0)
+    info("test_dio1: fs=$(fs), period=$(period)")
     w = World(fs=fs, period=period)
     f0, timeaxis = dio1(w, x)
     @test !any(isnan(f0))
@@ -18,6 +20,7 @@ function test_dio1(x, fs::Int=44100, period::Float64=5.0)
 end
 
 function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
+    info("test_stonemask: fs=$(fs), period=$(period)")
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
     f0, timeaxis = dio(w, x; opt=opt)
@@ -41,14 +44,17 @@ function test_envelope(x, fs::Int=44100, period::Float64=5.0,
 end
 
 function test_cheaptrick(x, fs::Int=44100, period::Float64=5.0)
+    info("test_cheaptrick: fs=$(fs), period=$(period)")
     test_envelope(x, fs, period, true)
 end
 
 function test_star(x, fs::Int=44100, period::Float64=5.0)
+    info("test_star: fs=$(fs), period=$(period)")
     test_envelope(x, fs, period, false)
 end
 
 function test_platinum(x, fs::Int=44100, period::Float64=5.0)
+    info("test_platinum: fs=$(fs), period=$(period)")
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
     f0, timeaxis = dio(w, x; opt=opt)
@@ -59,6 +65,7 @@ function test_platinum(x, fs::Int=44100, period::Float64=5.0)
 end
 
 function test_aperiodicity(x, fs::Int=44100, period::Float64=5.0)
+    info("test_aperiodicity: fs=$(fs), period=$(period)")
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
     f0, timeaxis = dio(w, x; opt=opt)
@@ -70,7 +77,8 @@ end
 # speech -> {f0, envelope, residual} -> speech
 function test_synthesis(x::AbstractArray, fs::Int=44100, period::Float64=5.0,
                         usecheaptrick::Bool=false, tol::Float64=0.1,)
-    info("fs=$(fs), period=$(period), tol=$(tol)")
+    info("test_synthesis: fs=$(fs), period=$(period),
+         usecheaptrick=$(usecheaptrick), tol=$(tol)")
 
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
@@ -115,7 +123,8 @@ function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
                                      period::Float64=5.0,
                                      usecheaptrick::Bool=true,
                                      tol::Float64=0.1)
-    info("fs=$(fs), period=$(period), tol=$(tol)")
+    info("test_aperiodicity_synthesis: fs=$(fs), period=$(period),
+         usecheaptrick=$(usecheaptrick), tol=$(tol)")
 
     w = World(fs=fs, period=period)
     opt = DioOption(80.0, 640.0, 2, period, 4)
@@ -179,7 +188,7 @@ for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
     test_aperiodicity_synthesis(x, fs, period, true, tol)
     # TODO fix: some memory leak or double free?
     gc()
-    test_aperiodicity_synthesis(x, fs, period, true, tol)
+    test_aperiodicity_synthesis(x, fs, period, false, tol)
     gc()
 end
 
