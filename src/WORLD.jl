@@ -2,17 +2,27 @@ module WORLD
 
 # A light-weight julia wrapper for WORLD.
 
-# Types
-export World, DioOption
+export
+    # Types
+    World,
+    DioOption,
 
-# World methods
-export dio, dio1, stonemask, star, cheaptrick, platinum, synthesis
+    # World methods
+    dio,
+    dio1,
+    stonemask,
+    star,
+    cheaptrick,
+    platinum,
+    synthesis,
 
-# Aperiodiciy analysis
-export aperiodicityratio, synthesis_from_aperiodicity
+    # Aperiodiciy analysis
+    aperiodicityratio,
+    synthesis_from_aperiodicity,
 
-# utils
-export get_fftsize_for_star, get_fftsize_for_cheaptrick
+    # utils
+    get_fftsize_for_star,
+    get_fftsize_for_cheaptrick
 
 # Dependency
 deps = joinpath(Pkg.dir("WORLD"), "deps", "deps.jl")
