@@ -2,15 +2,78 @@ using WORLD
 using Base.Test
 using WAV
 
+function test_dio(x, fs::Int=44100, period::Float64=5.0)
+    w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
+    f0, timeaxis = dio(w, x; opt=opt)
+    @test !any(isnan(f0))
+    @test !any(isnan(timeaxis))
+end
+
+function test_dio1(x, fs::Int=44100, period::Float64=5.0)
+    w = World(fs=fs, period=period)
+    f0, timeaxis = dio1(w, x)
+    @test !any(isnan(f0))
+    @test !any(isnan(timeaxis))
+end
+
+function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
+    w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
+    f0, timeaxis = dio(w, x; opt=opt)
+    f0 = stonemask(w, x, timeaxis, f0)
+    @test !any(isnan(f0))
+end
+
+function test_envelope(x, fs::Int=44100, period::Float64=5.0,
+                       usecheaptrick::Bool=true)
+    w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
+    f0, timeaxis = dio(w, x; opt=opt)
+    f0 = stonemask(w, x, timeaxis, f0)
+    spectrogram = zeros(0, 0)
+    if usecheaptrick
+        spectrogram = cheaptrick(w, x, timeaxis, f0)
+    else
+        spectrogram = star(w, x, timeaxis, f0)
+    end
+    @test !any(isnan(spectrogram))
+end
+
+function test_cheaptrick(x, fs::Int=44100, period::Float64=5.0)
+    test_envelope(x, fs, period, true)
+end
+
+function test_star(x, fs::Int=44100, period::Float64=5.0)
+    test_envelope(x, fs, period, false)
+end
+
+function test_platinum(x, fs::Int=44100, period::Float64=5.0)
+    w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
+    f0, timeaxis = dio(w, x; opt=opt)
+    f0 = stonemask(w, x, timeaxis, f0)
+    spectrogram = cheaptrick(w, x, timeaxis, f0)
+    residual = platinum(w, x, timeaxis, f0, spectrogram)
+    @test !any(isnan(residual))
+end
+
+function test_aperiodicity(x, fs::Int=44100, period::Float64=5.0)
+    w = World(fs=fs, period=period)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
+    f0, timeaxis = dio(w, x; opt=opt)
+    f0 = stonemask(w, x, timeaxis, f0)
+    aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
+    @test !any(isnan(aperiodicity))
+end
+
 # speech -> {f0, envelope, residual} -> speech
-function testworld(x::AbstractArray, fs::Int=44100, period::Float64=5.0;
-                   eps::Float64=0.1,
-                   use_cheaptrick::Bool=false)
-    info("fs=$(fs), period=$(period), eps=$(eps)")
+function test_synthesis(x::AbstractArray, fs::Int=44100, period::Float64=5.0,
+                        usecheaptrick::Bool=false, tol::Float64=0.1,)
+    info("fs=$(fs), period=$(period), tol=$(tol)")
 
     w = World(fs=fs, period=period)
-
-    opt = DioOption(80.0, 640.0, 2, 5.0, 4)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
 
     # Fundamental frequency (f0) estimation by DIO
     f0, timeaxis = dio(w, x; opt=opt)
@@ -22,8 +85,8 @@ function testworld(x::AbstractArray, fs::Int=44100, period::Float64=5.0;
     @test !any(isnan(f0))
 
     # Spectral envelope estimation
-    spectrogram = zeros(0,0)
-    if use_cheaptrick
+    spectrogram = zeros(0, 0)
+    if usecheaptrick
         spectrogram = cheaptrick(w, x, timeaxis, f0)
     else
         spectrogram = star(w, x, timeaxis, f0)
@@ -44,18 +107,18 @@ function testworld(x::AbstractArray, fs::Int=44100, period::Float64=5.0;
 
     info("errorrate=$(errorrate)")
 
-    @test errorrate < eps
+    @test errorrate < tol
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
-function testworld_aperiodicity(x::AbstractArray, fs::Int=44100,
-                                period::Float64=5.0;
-                                eps::Float64=0.1,
-                                use_cheaptrick::Bool=false)
-    info("fs=$(fs), period=$(period), eps=$(eps)")
+function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
+                                     period::Float64=5.0,
+                                     usecheaptrick::Bool=true,
+                                     tol::Float64=0.1)
+    info("fs=$(fs), period=$(period), tol=$(tol)")
 
     w = World(fs=fs, period=period)
-    opt = DioOption(80.0, 640.0, 2, 5.0, 4)
+    opt = DioOption(80.0, 640.0, 2, period, 4)
 
     # Fundamental frequency (f0) estimation by DIO
     f0, timeaxis = dio(w, x; opt=opt)
@@ -67,8 +130,8 @@ function testworld_aperiodicity(x::AbstractArray, fs::Int=44100,
     @test !any(isnan(f0))
 
     # Spectral envelope estimation
-    spectrogram = zeros(0,0)
-    if use_cheaptrick
+    spectrogram = zeros(0, 0)
+    if usecheaptrick
         spectrogram = cheaptrick(w, x, timeaxis, f0)
     else
         spectrogram = star(w, x, timeaxis, f0)
@@ -90,7 +153,7 @@ function testworld_aperiodicity(x::AbstractArray, fs::Int=44100,
 
     info("errorrate=$(errorrate)")
 
-    @test errorrate < eps
+    @test errorrate < tol
 end
 
 # Read test data (male)
@@ -101,22 +164,31 @@ x, fs = wavread(fpath)
 x = vec(x)
 fs = int(fs)
 
+for p in [5.0, 7.0, 10.0]
+    test_dio(x, fs, p)
+    test_dio1(x, fs, p)
+    test_stonemask(x, fs, p)
+    test_cheaptrick(x, fs, p)
+    test_star(x, fs, p)
+    test_aperiodicity(x, fs, p)
+    gc()
+end
+
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
-for (p, e) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
-    testworld_aperiodicity(x, fs, p; eps=e)
+for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
+    test_aperiodicity_synthesis(x, fs, period, true, tol)
     # TODO fix: some memory leak or double free?
     gc()
-    testworld_aperiodicity(x, fs, p; use_cheaptrick=true, eps=e)
+    test_aperiodicity_synthesis(x, fs, period, true, tol)
     gc()
 end
 
 info("aperiodicity based decomposition and synthesis tests passed.")
 
 # Test WORLD speech decomposition and re-synthesis
-# probably fail
-for (p, e) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
-    testworld(x, fs, p; eps=e)
+for (period, tol) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
+    test_synthesis(x, fs, period, true, tol)
     gc()
-    testworld(x, fs, p; use_cheaptrick=true, eps=e)
+    test_synthesis(x, fs, period, false, tol)
     gc()
 end
