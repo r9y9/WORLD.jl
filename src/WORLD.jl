@@ -43,6 +43,7 @@ end
 
 const defaultdioopt = DioOption(80.0, 640.0, 2.0, 5.0, 4)
 
+# will be deprecated
 World(;fs::Real=44100, period::Float64=5.0) = World(fs, period)
 
 function dio(w::World, x::Vector{Float64}; opt::DioOption=defaultdioopt)
