@@ -37,7 +37,7 @@ include("bridge.jl")
 # World is a composite type that holds common settings that are used during
 # analysis
 immutable World
-    fs::Int64       # Sample frequency
+    fs::Int         # Sample frequency
     period::Float64 # Frame period [ms]
 end
 
