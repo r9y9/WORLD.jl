@@ -166,7 +166,7 @@ function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
 end
 
 # Read test data (male)
-fpath = joinpath(Pkg.dir("WORLD"), "test", "data", "arayuru.wav")
+fpath = joinpath(Pkg.dir("WORLD"), "test", "data", "test16k.wav")
 x, fs = wavread(fpath)
 @assert size(x, 2) == 1 "The input data must be monoral."
 @assert !any(isnan(x))
