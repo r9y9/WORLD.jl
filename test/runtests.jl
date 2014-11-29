@@ -182,16 +182,19 @@ for period in [5.0, 7.0, 10.0]
     test_aperiodicity(x, fs, period)
 end
 
+# Test WORLD speech decomposition and re-synthesis
+for (period, tol) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
+    test_synthesis(x, fs, period, true, tol)
+    test_synthesis(x, fs, period, false, tol)
+end
+
+info("WORLD decomposition and re-synthesis tests passed.")
+
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
     test_aperiodicity_synthesis(x, fs, period, true, tol)
     test_aperiodicity_synthesis(x, fs, period, false, tol)
 end
 
-info("aperiodicity based decomposition and synthesis tests passed.")
+info("WORLD decomposition with aperiodicity and re-synthesis tests passed.")
 
-# Test WORLD speech decomposition and re-synthesis
-for (period, tol) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
-    test_synthesis(x, fs, period, true, tol)
-    test_synthesis(x, fs, period, false, tol)
-end
