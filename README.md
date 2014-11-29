@@ -91,3 +91,5 @@ y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
 ```
 
 ![](examples/synthesis_from_aperiodicity.png)
+
+For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/examples/Demonstration%20of%20WORLD.jl.ipynb).
