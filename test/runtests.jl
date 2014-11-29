@@ -180,16 +180,12 @@ for period in [5.0, 7.0, 10.0]
     test_cheaptrick(x, fs, period)
     test_star(x, fs, period)
     test_aperiodicity(x, fs, period)
-    gc()
 end
 
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
 for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
     test_aperiodicity_synthesis(x, fs, period, true, tol)
-    # TODO fix: some memory leak or double free?
-    gc()
     test_aperiodicity_synthesis(x, fs, period, false, tol)
-    gc()
 end
 
 info("aperiodicity based decomposition and synthesis tests passed.")
@@ -197,7 +193,5 @@ info("aperiodicity based decomposition and synthesis tests passed.")
 # Test WORLD speech decomposition and re-synthesis
 for (period, tol) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
     test_synthesis(x, fs, period, true, tol)
-    gc()
     test_synthesis(x, fs, period, false, tol)
-    gc()
 end
