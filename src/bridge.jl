@@ -63,7 +63,7 @@ function get_fftsize_for_star(fs::Int)
 end
 
 # Array{T,2} -> Array{Ptr{T}}
-function ptrarray2d!{T<:Real}(src::Array{T,2}, dst::Array{Ptr{T},1})
+function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
     for i=1:size(src, 2)
         @inbounds dst[i] = pointer(sub(src, 1:size(src, 1), i), 1)
     end
@@ -76,7 +76,7 @@ function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
-    ptrarray2d!(spectrogram, cspectrogram)
+    ptrarray2d!(cspectrogram, spectrogram)
 
     ccall((:Star, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
@@ -103,7 +103,7 @@ function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
-    ptrarray2d!(spectrogram, cspectrogram)
+    ptrarray2d!(cspectrogram, spectrogram)
 
     ccall((:CheapTrick, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
@@ -127,10 +127,10 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
-    ptrarray2d!(spectrogram, cspectrogram)
+    ptrarray2d!(cspectrogram, spectrogram)
 
     cresidual = Array(Ptr{Float64}, size(residual, 2))
-    ptrarray2d!(residual, cresidual)
+    ptrarray2d!(cresidual, residual)
 
     ccall((:Platinum, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
@@ -153,10 +153,10 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
-    ptrarray2d!(spectrogram, cspectrogram)
+    ptrarray2d!(cspectrogram, spectrogram)
 
     cresidual = Array(Ptr{Float64}, size(residual, 2))
-    ptrarray2d!(residual, cresidual)
+    ptrarray2d!(cresidual, residual)
 
     synthesized = Array(Float64, len)
     ccall((:Synthesis, libworld), Void,
@@ -176,7 +176,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     caperiodicity = Array(Ptr{Float64}, size(aperiodicity, 2))
-    ptrarray2d!(aperiodicity, caperiodicity)
+    ptrarray2d!(caperiodicity, aperiodicity)
 
     ccall((:AperiodicityRatio, libworld), Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Int, Ptr{Float64}, Int64,
@@ -200,10 +200,10 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
-    ptrarray2d!(spectrogram, cspectrogram)
+    ptrarray2d!(cspectrogram, spectrogram)
 
     caperiodicity = Array(Ptr{Float64}, size(aperiodicity, 2))
-    ptrarray2d!(aperiodicity, caperiodicity)
+    ptrarray2d!(caperiodicity, aperiodicity)
 
     synthesized = Array(Float64, len)
     ccall((:SynthesisFromAperiodicity, libworld), Void,
