@@ -179,6 +179,7 @@ for period in [5.0, 7.0, 10.0]
     test_stonemask(x, fs, period)
     test_cheaptrick(x, fs, period)
     test_star(x, fs, period)
+    test_platinum(x, fs, period)
     test_aperiodicity(x, fs, period)
 end
 
@@ -197,4 +198,3 @@ for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
 end
 
 info("WORLD decomposition with aperiodicity and re-synthesis tests passed.")
-
