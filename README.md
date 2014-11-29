@@ -72,7 +72,7 @@ spectrogram = cheaptrick(w, x, timeaxis, f0)
 
 #### Star
 
-Note that Star will be deprecated in future version. Use CheapTrick instread.
+Note that Star will be deprecated in future version. Please use CheapTrick instread.
 
 ```julia
 spectrogram = star(w, x, timeaxis, f0)
