@@ -15,7 +15,7 @@ w = World(fs, period) # fs might be 16000, 22100 or 44100
 
 This is not necessary but might be useful. The composite type `World` just holds sample frequency and frame period that are used during analysis. You can call WORLD functions directly as well.
 
-Suppose `x::Array{Float64}` is a input monoral speech signal below:
+Suppose `x::Array{Float64}` is a input monoral speech signal like
 
 ![](examples/x.png)
 
