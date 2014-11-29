@@ -8,7 +8,7 @@
 - spectral envelope
 - excitation signal (or aperiodicy used in TANDEM-STRAIGHT)
 
-and re-synthesis a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
+and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
 
 ## API
 
