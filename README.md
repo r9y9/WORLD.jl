@@ -47,7 +47,7 @@ Suppose `x::Array{Float64}` is a input monoral speech signal like
 
 ```julia
 opt = DioOption(80.0, 640, 2.0, period, 4) # f0floor, f0ceil, channels in octave, period, speed
-f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(fs, x, opt=opt)` without using composite type `World`
+f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(x, fs, opt=opt)` without using composite type `World`
 ```
 
 ![](examples/f0_by_dio.png)
