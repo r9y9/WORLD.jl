@@ -172,6 +172,8 @@ x, fs = wavread(fpath)
 x = vec(x)
 fs = int(fs)
 
+include("consistency.jl")
+
 for period in [5.0, 7.0, 10.0]
     test_dio(x, fs, period)
     test_dio1(x, fs, period)
