@@ -17,6 +17,8 @@ This is not necessary but might be useful. The composite type `World` just holds
 
 Suppose `x::Array{Float64}` is a input monoral speech signal below:
 
+![](examples/x.png)
+
 ### DIO
 
 ```julia
@@ -24,17 +26,23 @@ opt = DioOption(80.0, 640, 2.0, period, 4) # f0floor, f0ceil, channels in octave
 f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(fs, x, opt=opt)` without using composite type `World`
 ```
 
+![](examples/f0_by_dio.png)
+
 ### StoneMask
 
 ```julia
 f0 = stonemask(w, x, timeaxis, f0)
 ```
 
+![](examples/f0_refinment.png)
+
 ### CheapTrick
 
 ```julia
 spectrogram = cheaptrick(w, x, timeaxis, f0)
 ```
+
+![](examples/envelope_by_cheaptrick.png)
 
 ### Star
 
@@ -54,14 +62,20 @@ residual = platinum(w, x, timeaxis, f0, spectrogram)
 y = synthesis(w, f0, spectrogram, residual, length(x))
 ```
 
+![](examples/signal_reconstruction.png)
+
 ### Aperiodicity ratio
 
 ```julia
 aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
 ```
 
+![](examples/aperiodicity_ratio.png)
+
 ### Synthesis from aperiodicity
 
 ```julia
 y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
 ```
+
+![](examples/signal_reconstruction_aperiodicity.png)
