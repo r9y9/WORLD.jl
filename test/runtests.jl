@@ -2,6 +2,8 @@ using WORLD
 using Base.Test
 using WAV
 
+include("consistency.jl")
+
 function test_dio(x, fs::Int=44100, period::Float64=5.0)
     info("test_dio: fs=$(fs), period=$(period)")
     w = World(fs, period)
@@ -171,8 +173,6 @@ x, fs = wavread(fpath)
 @assert !any(isnan(x))
 x = vec(x)
 fs = int(fs)
-
-include("consistency.jl")
 
 for period in [5.0, 7.0, 10.0]
     test_dio(x, fs, period)
