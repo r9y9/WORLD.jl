@@ -34,7 +34,7 @@ f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(fs, x, opt=opt)` witho
 f0 = stonemask(w, x, timeaxis, f0)
 ```
 
-![](examples/f0_refinment.png)
+![](examples/f0_refinement.png)
 
 ### CheapTrick
 
@@ -62,7 +62,7 @@ residual = platinum(w, x, timeaxis, f0, spectrogram)
 y = synthesis(w, f0, spectrogram, residual, length(x))
 ```
 
-![](examples/signal_reconstruction.png)
+![](examples/synthesis.png)
 
 ### Aperiodicity ratio
 
@@ -78,4 +78,4 @@ aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
 y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
 ```
 
-![](examples/signal_reconstruction_aperiodicity.png)
+![](examples/synthesis_from_aperiodicity.png)
