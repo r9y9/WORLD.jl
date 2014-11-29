@@ -123,7 +123,7 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
                   spectrogram::Matrix{Float64})
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
     const freqbins = fftsize +1
-    residual = Array(Float64, freqbins, length(f0))
+    residual = zeros(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
