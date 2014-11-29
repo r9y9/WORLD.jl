@@ -2,7 +2,13 @@
 
 [![Build Status](https://travis-ci.org/r9y9/WORLD.jl.svg?branch=master)](https://travis-ci.org/r9y9/WORLD.jl)
 
-**[NOT stable yet]** WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, modification and synthesis system. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
+**[NOT stable yet]** WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, modification and synthesis system. WORLD provides a way to decompose a speech signal into
+
+- Fundamental frequency (F0)
+- spectral envelope
+- excitation signal (or aperiodicy used in TANDEM-STRAIGHT)
+
+and re-synthesis a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
 
 ## API
 
@@ -57,6 +63,8 @@ spectrogram = star(w, x, timeaxis, f0)
 ```julia
 residual = platinum(w, x, timeaxis, f0, spectrogram)
 ```
+
+![](examples/residual_spectrogram_by_platinum.png)
 
 ### Synthesis
 
