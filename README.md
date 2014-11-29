@@ -10,6 +10,22 @@
 
 and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
 
+## Supported Platforms
+
+- Linux
+- Mac OS X
+
+## Installation
+
+Run the following commands on your julia interactive settion (REPL):
+
+```julia
+julia> Pkg.clone("https://github.com/r9y9/WORLD.jl")
+julia> Pkg.build("WORLD")
+```
+
+All dependencies are resolved with `Pkg.clone` and `Pkg.build`.
+
 ## Usage
 
 ### Basic setup
