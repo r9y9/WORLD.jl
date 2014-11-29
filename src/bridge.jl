@@ -17,8 +17,8 @@ immutable DioOption
 end
 
 function get_samples_for_dio(fs::Int, len::Int, period::Float64)
-    return ccall((:GetSamplesForDIO, libworld), Int,
-                 (Int, Int, Float64), fs, len, period)
+    ccall((:GetSamplesForDIO, libworld), Int,
+          (Int, Int, Float64), fs, len, period)
 end
 
 function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
@@ -29,7 +29,7 @@ function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
     ccall((:DioByOptPtr, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, Ptr{DioOption}, Ptr{Float64}, Ptr{Float64}),
           x, length(x), fs, &opt, timeaxis, f0)
-    return f0, timeaxis
+    f0, timeaxis
 end
 
 # dio v0.1.0, will be deprecated
@@ -41,7 +41,7 @@ function dio1(x::Vector{Float64}, fs::Int, period::Float64)
     ccall((:DioOld, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, Float64, Ptr{Float64}, Ptr{Float64}),
           x, length(x), fs, period, timeaxis, f0)
-    return f0, timeaxis
+    f0, timeaxis
 end
 
 function get_fftsize_for_star(fs::Int)
@@ -55,7 +55,7 @@ function stonemask(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int,
            Ptr{Float64}),
           x, length(x), fs, timeaxis, f0, length(f0), refinedF0)
-    return refinedF0
+    refinedF0
 end
 
 function get_fftsize_for_star(fs::Int)
@@ -88,12 +88,11 @@ function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
         spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
     end
 
-    return spectrogram
+    spectrogram
 end
 
 function get_fftsize_for_cheaptrick(fs::Int)
-    return ccall((:GetFFTSizeForCheapTrick, libworld), Int,
-                 (Int,), fs)
+    ccall((:GetFFTSizeForCheapTrick, libworld), Int, (Int,), fs)
 end
 
 function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
@@ -115,7 +114,7 @@ function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
         spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
     end
 
-    return spectrogram
+    spectrogram
 end
 
 function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
@@ -143,7 +142,7 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
         residual[:,i] = pointer_to_array(cresidual[i], freqbins)
     end
 
-    return residual
+    residual
 end
 
 function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
@@ -165,7 +164,7 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
           f0, length(f0), cspectrogram, cresidual, fftsize, period, fs, len, 
           synthesized)
 
-    return synthesized
+    synthesized
 end
 
 function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
@@ -188,7 +187,7 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
         aperiodicity[:,i] = pointer_to_array(caperiodicity[i], freqbins)
     end
 
-    return aperiodicity
+    aperiodicity
 end
 
 function synthesis_from_aperiodicity(f0::Vector{Float64},
@@ -212,5 +211,5 @@ function synthesis_from_aperiodicity(f0::Vector{Float64},
           f0, length(f0), cspectrogram, caperiodicity, fftsize, period, fs,
           len, synthesized)
 
-    return synthesized
+    synthesized
 end
