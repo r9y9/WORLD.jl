@@ -76,7 +76,7 @@ end
 
 # speech -> {f0, envelope, residual} -> speech
 function test_synthesis(x::AbstractArray, fs::Int=44100, period::Float64=5.0,
-                        usecheaptrick::Bool=false, tol::Float64=0.1,)
+                        usecheaptrick::Bool=false, tol::Float64=0.1)
     info("test_synthesis: fs=$(fs), period=$(period),
          usecheaptrick=$(usecheaptrick), tol=$(tol)")
 
@@ -148,7 +148,6 @@ function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
     @test !any(isnan(spectrogram))
 
     # Aperiodicity ratio estimation
-    # some bugs?
     aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
     @test !any(isnan(aperiodicity))
 
