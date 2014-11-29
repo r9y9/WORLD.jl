@@ -35,7 +35,7 @@ period = 5.0
 w = World(fs, period) # fs might be 16000, 22100 or 44100
 ```
 
-This is not necessary but might be useful. The composite type `World` just holds sample frequency and frame period that are used almost all of WORLD functions. You can call WORLD functions directly as well.
+This is not necessary but might be useful. The composite type `World` just holds sample frequency and frame period that are used by almost all of WORLD functions. You can call WORLD functions directly as well.
 
 Suppose `x::Array{Float64}` is a input monoral speech signal like
 
