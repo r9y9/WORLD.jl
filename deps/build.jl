@@ -9,12 +9,12 @@ deps = [
 const version = "0.1.4_2_1"
 
 provides(Sources,
-         URI("https://github.com/r9y9/world/archive/v$(version).tar.gz"),
+         URI("https://github.com/r9y9/WORLD/archive/v$(version).tar.gz"),
          world,
-         unpacked_dir="world-$(version)")
+         unpacked_dir="WORLD-$(version)")
 
 prefix = joinpath(BinDeps.depsdir(world), "usr")
-srcdir = joinpath(BinDeps.depsdir(world), "src", "world-$(version)")
+srcdir = joinpath(BinDeps.depsdir(world), "src", "WORLD-$(version)")
 
 provides(SimpleBuild,
           (@build_steps begin
