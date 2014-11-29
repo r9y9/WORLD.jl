@@ -50,6 +50,8 @@ spectrogram = cheaptrick(w, x, timeaxis, f0)
 spectrogram = star(w, x, timeaxis, f0)
 ```
 
+![](examples/envelope_by_star.png)
+
 ### Platinum
 
 ```julia
