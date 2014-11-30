@@ -13,14 +13,6 @@ function test_dio(x, fs::Int=44100, period::Float64=5.0)
     @test !any(isnan(timeaxis))
 end
 
-function test_dio1(x, fs::Int=44100, period::Float64=5.0)
-    info("test_dio1: fs=$(fs), period=$(period)")
-    w = World(fs, period)
-    f0, timeaxis = dio1(w, x)
-    @test !any(isnan(f0))
-    @test !any(isnan(timeaxis))
-end
-
 function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
     info("test_stonemask: fs=$(fs), period=$(period)")
     w = World(fs, period)
@@ -176,7 +168,6 @@ fs = int(fs)
 
 for period in [5.0, 7.0, 10.0]
     test_dio(x, fs, period)
-    test_dio1(x, fs, period)
     test_stonemask(x, fs, period)
     test_cheaptrick(x, fs, period)
     test_star(x, fs, period)
