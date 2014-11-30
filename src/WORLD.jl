@@ -9,7 +9,7 @@ export
 
     # World methods
     dio,
-    dio1,
+    dio1, # deprecated
     stonemask,
     star,
     cheaptrick,
@@ -52,10 +52,6 @@ function dio(w::World, x::Vector{Float64}; opt::DioOption=defaultdioopt)
     dio(x, w.fs, opt)
 end
 
-function dio1(w::World, x::Vector{Float64})
-    dio1(x, w.fs, w.period)
-end
-
 function stonemask(w::World, x::Vector{Float64},
                    timeaxis::Vector{Float64}, f0::Vector{Float64})
     stonemask(x, w.fs, timeaxis, f0)
@@ -94,5 +90,7 @@ function synthesis_from_aperiodicity(w::World, f0::Vector{Float64},
     synthesis_from_aperiodicity(f0, spectrogram, aperiodicity, w.period,
                                 w.fs, len)
 end
+
+@deprecate dio1(w::World, x::Vector{Float64}) dio(w, x, opt=DioOption(80.0, 640.0, 2.0, w.period, div(w.fs, 4000.0)))
 
 end # module WORLD

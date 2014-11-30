@@ -32,18 +32,6 @@ function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
     f0, timeaxis
 end
 
-# dio v0.1.0, will be deprecated
-function dio1(x::Vector{Float64}, fs::Int, period::Float64)
-    expectedlen = get_samples_for_dio(fs, length(x), period)
-
-    f0 = Array(Float64, expectedlen)
-    timeaxis = Array(Float64, expectedlen)
-    ccall((:DioOld, libworld),  Void,
-          (Ptr{Float64}, Int64, Int64, Float64, Ptr{Float64}, Ptr{Float64}),
-          x, length(x), fs, period, timeaxis, f0)
-    f0, timeaxis
-end
-
 function get_fftsize_for_star(fs::Int)
     ccall((:GetFFTSizeForStar, libworld), Int, (Int,), fs)
 end
