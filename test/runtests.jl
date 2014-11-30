@@ -108,12 +108,12 @@ function test_synthesis(x::AbstractArray, fs::Int=44100, period::Float64=5.0,
     @test !any(isnan(residual))
 
     # Sysnthesis from f0, spectral envelope and residual spectrogram.
-    y = synthesis(w, f0, spectrogram, residual, length(x))
+    y_length = int((length(f0)-1)*period/1000 * fs) + 1
+    y = synthesis(w, f0, spectrogram, residual, y_length)
     @test !any(isnan(y))
 
-    @test length(y) == length(x)
-
-    errorrate = mean(abs(y-x)) / maxabs(x)
+    minlen = min(length(x), length(y))
+    errorrate = mean(abs(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
 
     info("errorrate=$(errorrate)")
 
@@ -154,12 +154,12 @@ function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
     @test !any(isnan(aperiodicity))
 
     # Sysnthesis from f0, spectral envelope and aperiodicity ratio.
+    y_length = int((length(f0)-1)*period/1000 * fs) + 1
     y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
     @test !any(isnan(y))
 
-    @test length(y) == length(x)
-
-    errorrate = mean(abs(y-x)) / maxabs(x)
+    minlen = min(length(x), length(y))
+    errorrate = mean(abs(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
 
     info("errorrate=$(errorrate)")
 
@@ -185,7 +185,7 @@ for period in [5.0, 7.0, 10.0]
 end
 
 # Test WORLD speech decomposition and re-synthesis
-for (period, tol) in ([5.0, 0.1], [7.0, 0.165], [10.0, 0.165])
+for (period, tol) in ([5.0, 0.10], [7.0, 0.15], [10.0, 0.16])
     test_synthesis(x, fs, period, true, tol)
     test_synthesis(x, fs, period, false, tol)
 end
@@ -193,7 +193,7 @@ end
 info("WORLD decomposition and re-synthesis tests passed.")
 
 # Test WORLD speech decomposition and re-synthesis with aperiodicity
-for (period, tol) in ([5.0, 0.135], [7.0, 0.165], [10.0, 0.165])
+for (period, tol) in ([5.0, 0.135], [7.0, 0.16], [10.0, 0.16])
     test_aperiodicity_synthesis(x, fs, period, true, tol)
     test_aperiodicity_synthesis(x, fs, period, false, tol)
 end
