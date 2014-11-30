@@ -79,8 +79,6 @@ residual = platinum(w, x, timeaxis, f0, spectrogram)
 
 Note that the result is spectrum of excitation signal.
 
-![](examples/residual_spectrogram_by_platinum.png)
-
 ### Synthesis
 
 ```julia
