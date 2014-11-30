@@ -15,49 +15,49 @@ opt = DioOption(80.0, 640.0, 2, period, 12)
 f0, timeaxis = dio(w, x; opt=opt)
 f0_org = vec(readdlm("data/f0.txt"))
 
-println("Error in DIO is $(maximum(abs(f0-f0_org)))")
+println("Maximum error in DIO is $(maximum(abs(f0-f0_org)))")
 @test length(f0) == length(f0_org)
-@test_approx_eq_eps f0 f0_org 1.0e-15
+@test_approx_eq_eps f0 f0_org 1.0e-16
 
 # F0 refienment by StoneMask
 f0 = stonemask(w, x, timeaxis, f0)
 f0_refined_org = vec(readdlm("data/f0_refined.txt"))
 
-println("Error in StoneMask is $(maximum(abs(f0-f0_refined_org)))")
+println("Maximum error in StoneMask is $(maximum(abs(f0-f0_refined_org)))")
 @test length(f0) == length(f0_refined_org)
-@test_approx_eq_eps f0 f0_refined_org 1.0e-15
+@test_approx_eq_eps f0 f0_refined_org 1.0e-16
 
 # Spectral envelope estimation by CheapTrick
 spectrogram = cheaptrick(w, x, timeaxis, f0)
 spectrogram_org = readdlm("data/spectrogram.txt")'
 
-println("Error in CheapTrick is $(maximum(abs(spectrogram - spectrogram_org)))")
+println("Maximum error in CheapTrick is $(maximum(abs(spectrogram - spectrogram_org)))")
 @test size(spectrogram) == size(spectrogram_org)
-@test_approx_eq_eps spectrogram spectrogram_org 1.0e-15
+@test_approx_eq_eps spectrogram spectrogram_org 1.0e-16
 
 residual = platinum(w, x, timeaxis, f0, spectrogram)
 residual_org = readdlm("data/residual_spectrogram.txt")'
-println("Error in Platinum is $(maximum(abs(residual-residual_org)))")
+println("Maximum error in Platinum is $(maximum(abs(residual-residual_org)))")
 @test size(residual) == size(residual_org)
-@test_approx_eq_eps residual residual_org 1.0e-15
+@test_approx_eq_eps residual residual_org 1.0e-16
 
 aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
 aperiodicity_org = readdlm("data/aperiodicity.txt")'
-println("Error in aperiodicy is $(maximum(abs(aperiodicity-aperiodicity_org)))")
+println("Maximum error in aperiodicy is $(maximum(abs(aperiodicity-aperiodicity_org)))")
 @test size(aperiodicity) == size(aperiodicity)
-@test_approx_eq_eps aperiodicity aperiodicity_org 1.0e-15
+@test_approx_eq_eps aperiodicity aperiodicity_org 1.0e-16
 
 # Synthesis
 y_length = int((length(f0)-1)*period/1000 * fs) + 1
 y = synthesis(w, f0, spectrogram, residual, y_length)
 y_org = vec(readdlm("data/x_synthesized.txt"))
-println("Error in synthesis is $(maximum(abs(y-y_org)))")
+println("Maximum error in synthesis is $(maximum(abs(y-y_org)))")
 @test length(y) == length(y_org)
-@test_approx_eq_eps y y_org 1.0e-15
+@test_approx_eq_eps y y_org 1.0e-16
 
 # Synthesis from aperiodicy
 y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, y_length)
 y_org = vec(readdlm("data/x_synthesized_from_aperiodicity.txt"))
-println("Error in synthesis from aperiodicy is $(maximum(abs(y-y_org)))")
+println("Maximum error in synthesis_from_aperiodicy is $(maximum(abs(y-y_org)))")
 @test length(y) == length(y_org)
-@test_approx_eq_eps y y_org 1.0e-15
+@test_approx_eq_eps y y_org 1.0e-16
