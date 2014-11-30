@@ -69,16 +69,6 @@ spectrogram = cheaptrick(w, x, timeaxis, f0)
 
 ![](examples/envelope_by_cheaptrick.png)
 
-#### Star
-
-Note that Star will be deprecated in future version. Please use CheapTrick instread.
-
-```julia
-spectrogram = star(w, x, timeaxis, f0)
-```
-
-![](examples/envelope_by_star.png)
-
 ### Excitation signal estimation
 
 #### Platinum
