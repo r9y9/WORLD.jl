@@ -34,7 +34,7 @@ All dependencies are resolved with `Pkg.clone` and `Pkg.build`.
 w = World(fs, period) # fs might be 16000, 22100 or 44100, period is a frame period in msec.
 ```
 
-This is not necessary but might be useful. The composite type `World` just holds sample frequency and frame period that are used in almost all of WORLD functions. You can call WORLD functions directly as well.
+This is not necessary but might be useful. The composite type `World` just holds sampling frequency and frame period that are used in almost all of WORLD functions. You can call WORLD functions directly as well.
 
 Suppose `x::Vector{Float64}` is a input monoral speech signal like
 
