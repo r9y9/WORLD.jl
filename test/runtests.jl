@@ -2,7 +2,10 @@ using WORLD
 using Base.Test
 using WAV
 
-include("consistency.jl")
+# Check consistency of the results between WORLD and WORLD.jl.
+# Due to the results of the WORLD were dumped (see ./data) on linux,
+# we test consistency only on linux.
+@linux_only include("consistency.jl")
 
 function test_dio(x, fs::Int=44100, period::Float64=5.0)
     info("test_dio: fs=$(fs), period=$(period)")
