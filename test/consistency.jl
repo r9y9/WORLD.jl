@@ -1,6 +1,7 @@
 # Check consistency with the original WORLD
-# Note that all of the results of the original WORLD are dumped as %.16lf
-# accuracy.
+# Note that all of the results of the original WORLD were dumped as %.16lf
+# accuracy on Ubuntu 14.04 64bit machine. g++ v4.8.2 was used to compile the
+# WORLD.
 
 info("Check consistency with the original WORLD")
 
