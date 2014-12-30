@@ -13,6 +13,7 @@ function test_dio(x, fs::Int=44100, period::Float64=5.0)
     opt = DioOption(80.0, 640.0, 2, period, 4)
     f0, timeaxis = dio(w, x; opt=opt)
     @test !any(isnan(f0))
+    @test all(f0 .>= 0.0)
     @test !any(isnan(timeaxis))
 end
 
@@ -23,6 +24,7 @@ function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
     f0, timeaxis = dio(w, x; opt=opt)
     f0 = stonemask(w, x, timeaxis, f0)
     @test !any(isnan(f0))
+    @test all(f0 .>= 0.0)
 end
 
 function test_envelope(x, fs::Int=44100, period::Float64=5.0,
