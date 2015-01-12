@@ -1,5 +1,7 @@
 @assert isdefined(:libworld)
 
+# DioOption represents a set of options that is used in DIO,
+# a fundamental frequency analysis.
 immutable DioOption
     f0floor::Float64
     f0ceil::Float64
@@ -8,6 +10,7 @@ immutable DioOption
     speed::Int
 
     function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
+        f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
         new(convert(Float64, f0floor),
             convert(Float64, f0ceil),
             convert(Float64, channels_in_octave),
@@ -16,13 +19,13 @@ immutable DioOption
     end
 end
 
-function get_samples_for_dio(fs::Int, len::Int, period::Float64)
+function get_samples_for_dio(fs::Real, len::Integer, period::Real)
     ccall((:GetSamplesForDIO, libworld), Int,
           (Int, Int, Float64), fs, len, period)
 end
 
-function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
-    const expectedlen = get_samples_for_dio(fs, length(x), opt.period)
+function dio(x::AbstractVector{Float64}, fs::Real, opt::DioOption)
+    expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array(Float64, expectedlen)
     timeaxis = Array(Float64, expectedlen)
     # Note that value passinig of julia-type to C-struct doesn't work.
@@ -32,12 +35,13 @@ function dio(x::Vector{Float64}, fs::Int, opt::DioOption)
     f0, timeaxis
 end
 
-function get_fftsize_for_star(fs::Int)
+function get_fftsize_for_star(fs::Integer)
     ccall((:GetFFTSizeForStar, libworld), Int, (Int,), fs)
 end
 
-function stonemask(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
-                   f0::Vector{Float64})
+function stonemask(x::AbstractVector{Float64}, fs::Integer,
+                   timeaxis::AbstractVector{Float64},
+                   f0::AbstractVector{Float64})
     refinedF0 = Array(Float64, length(f0))
     ccall((:StoneMask, libworld),  Void,
           (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int,
@@ -46,7 +50,7 @@ function stonemask(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     refinedF0
 end
 
-function get_fftsize_for_star(fs::Int)
+function get_fftsize_for_star(fs::Integer)
     ccall((:GetFFTSizeForStar, libworld), Int, (Int,), fs)
 end
 
@@ -57,9 +61,10 @@ function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
     end
 end
 
-function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
-              f0::Vector{Float64})
-    const freqbins = div(get_fftsize_for_star(fs), 2) + 1
+function star(x::AbstractVector{Float64}, fs::Integer,
+              timeaxis::AbstractVector{Float64},
+              f0::AbstractVector{Float64})
+    freqbins = get_fftsize_for_star(fs)>>1 + 1
     spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -79,13 +84,14 @@ function star(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     spectrogram
 end
 
-function get_fftsize_for_cheaptrick(fs::Int)
+function get_fftsize_for_cheaptrick(fs::Integer)
     ccall((:GetFFTSizeForCheapTrick, libworld), Int, (Int,), fs)
 end
 
-function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
-                    f0::Vector{Float64})
-    const freqbins = div(get_fftsize_for_cheaptrick(fs), 2) + 1
+function cheaptrick(x::AbstractVector{Float64}, fs::Integer,
+                    timeaxis::AbstractVector{Float64},
+                    f0::AbstractVector{Float64})
+    freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
     spectrogram = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -105,11 +111,12 @@ function cheaptrick(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     spectrogram
 end
 
-function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
-                  f0::Vector{Float64},
-                  spectrogram::Matrix{Float64})
-    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
-    const freqbins = fftsize +1
+function platinum(x::AbstractVector{Float64}, fs::Integer,
+                  timeaxis::AbstractVector{Float64},
+                  f0::AbstractVector{Float64},
+                  spectrogram::AbstractMatrix{Float64})
+    fftsize = get_fftsize_for_cheaptrick(fs)
+    freqbins = fftsize +1
     residual = zeros(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -133,10 +140,11 @@ function platinum(x::Vector{Float64}, fs::Int, timeaxis::Vector{Float64},
     residual
 end
 
-function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
-                   residual::Matrix{Float64},
-                   period::Float64, fs::Int, len::Int)
-    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
+function synthesis(f0::AbstractVector{Float64},
+                   spectrogram::AbstractMatrix{Float64},
+                   residual::AbstractMatrix{Float64},
+                   period::Real, fs::Integer, len::Integer)
+    fftsize = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
@@ -149,14 +157,15 @@ function synthesis(f0::Vector{Float64}, spectrogram::Matrix{Float64},
     ccall((:Synthesis, libworld), Void,
           (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
            Int64, Float64, Int64, Int64, Ptr{Float64}),
-          f0, length(f0), cspectrogram, cresidual, fftsize, period, fs, len, 
+          f0, length(f0), cspectrogram, cresidual, fftsize, period, fs, len,
           synthesized)
 
     synthesized
 end
 
-function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
-                           timeaxis::Vector{Float64})
+function aperiodicityratio(x::AbstractVector{Float64}, fs::Integer,
+                           f0::AbstractVector{Float64},
+                           timeaxis::AbstractVector{Float64})
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
     const freqbins = div(fftsize, 2) + 1
     aperiodicity = Array(Float64, freqbins, length(f0))
@@ -178,11 +187,11 @@ function aperiodicityratio(x::Vector{Float64}, fs::Int, f0::Vector{Float64},
     aperiodicity
 end
 
-function synthesis_from_aperiodicity(f0::Vector{Float64},
-                                     spectrogram::Matrix{Float64},
-                                     aperiodicity::Matrix{Float64},
-                                     period::Float64,
-                                     fs::Int, len::Int)
+function synthesis_from_aperiodicity(f0::AbstractVector{Float64},
+                                     spectrogram::AbstractMatrix{Float64},
+                                     aperiodicity::AbstractMatrix{Float64},
+                                     period::Real,
+                                     fs::Integer, len::Integer)
     const fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}

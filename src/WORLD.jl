@@ -48,7 +48,7 @@ World(;fs::Real=44100, period::Float64=5.0) = World(fs, period)
 
 function dio(w::World, x::Vector{Float64}; opt::DioOption=defaultdioopt)
     w.period == opt.period ||
-        throw("Inconsistent frame period: $(w.period) != $(opt.period)")
+        throw(ArgmentError("Inconsistent frame period: $(w.period) != $(opt.period)"))
     dio(x, w.fs, opt)
 end
 
