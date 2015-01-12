@@ -15,6 +15,8 @@ and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.
 - Linux
 - Mac OS X
 
+Note that the original WORLD works in windows as well. In orer to use WORLD.jl in windows, you have to build WORLD yourself since currently we don't have a installation script.
+
 ## Installation
 
 Run the following commands on your julia interactive settion (REPL):
