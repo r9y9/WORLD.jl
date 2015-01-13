@@ -22,6 +22,12 @@ Note that the original WORLD works in windows as well. In orer to use WORLD.jl i
 Run the following commands on your julia interactive settion (REPL):
 
 ```julia
+julia> Pkg.add("WORLD")
+```
+
+if you want the latest master, run
+
+```julia
 julia> Pkg.clone("https://github.com/r9y9/WORLD.jl")
 julia> Pkg.build("WORLD")
 ```
