@@ -77,8 +77,8 @@ function star(x::AbstractVector{Float64}, fs::Integer,
           x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
-    for i=1:length(f0)
-        spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
+    for i=1:length(f0), j=1:freqbins
+        @inbounds spectrogram[j,i] = unsafe_load(cspectrogram[i], j)
     end
 
     spectrogram
@@ -104,8 +104,8 @@ function cheaptrick(x::AbstractVector{Float64}, fs::Integer,
           x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
-    for i=1:length(f0)
-        spectrogram[:,i] = pointer_to_array(cspectrogram[i], freqbins)
+    for i=1:length(f0), j=1:freqbins
+        @inbounds spectrogram[j,i] = unsafe_load(cspectrogram[i], j)
     end
 
     spectrogram
@@ -133,8 +133,8 @@ function platinum(x::AbstractVector{Float64}, fs::Integer,
           cresidual)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
-    for i=1:length(f0)
-        residual[:,i] = pointer_to_array(cresidual[i], freqbins)
+    for i=1:length(f0), j=1:freqbins
+        @inbounds residual[j,i] = unsafe_load(cresidual[i], j)
     end
 
     residual
@@ -166,8 +166,8 @@ end
 function aperiodicityratio(x::AbstractVector{Float64}, fs::Integer,
                            f0::AbstractVector{Float64},
                            timeaxis::AbstractVector{Float64})
-    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
-    const freqbins = div(fftsize, 2) + 1
+    fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    freqbins = div(fftsize, 2) + 1
     aperiodicity = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
@@ -180,8 +180,8 @@ function aperiodicityratio(x::AbstractVector{Float64}, fs::Integer,
           x, length(x), fs, f0, length(f0), timeaxis, fftsize, caperiodicity)
 
     # Array{Float64,2} <- Array{Ptr{Float64}}
-    for i=1:length(f0)
-        aperiodicity[:,i] = pointer_to_array(caperiodicity[i], freqbins)
+    for i=1:length(f0), j=1:freqbins
+        aperiodicity[j,i] = unsafe_load(caperiodicity[i], j)
     end
 
     aperiodicity
@@ -192,7 +192,7 @@ function synthesis_from_aperiodicity(f0::AbstractVector{Float64},
                                      aperiodicity::AbstractMatrix{Float64},
                                      period::Real,
                                      fs::Integer, len::Integer)
-    const fftsize::Int = get_fftsize_for_cheaptrick(fs)
+    fftsize::Int = get_fftsize_for_cheaptrick(fs)
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
     cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
