@@ -195,3 +195,21 @@ for (period, tol) in ([5.0, 0.135], [7.0, 0.16], [10.0, 0.16])
 end
 
 println("WORLD decomposition with aperiodicity and re-synthesis tests passed.")
+
+let
+    w1 = World(44100, 5.0)
+    w2 = World(fs=44100, period=5.0)
+    @test w1 == w2
+end
+
+for fs in [16000, 20000]
+    s = get_fftsize_for_star(fs)
+    c = get_fftsize_for_cheaptrick(fs)
+    @test s == c == 1024
+end
+
+for fs in [44100, 48000]
+    s = get_fftsize_for_star(fs)
+    c = get_fftsize_for_cheaptrick(fs)
+    @test s == c == 2048
+end
