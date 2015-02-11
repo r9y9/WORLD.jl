@@ -112,4 +112,24 @@ y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
 
 ![](examples/synthesis_from_aperiodicity.png)
 
+### Conversion between spectrum envelope and mel-cepstrum
+
+#### spectrum envelope to mel-cepstrum
+
+```julia
+mc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41
+```
+
+`order` is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter which often used in mel-cepstrum definition.
+
+![](examples/melcepstrum.png)
+
+#### mel-cepstrum to spectrum envelope
+
+```julia
+approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
+```
+
+![](examples/envelope_reconstructed_from_melcepstrum.png)
+
 For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/examples/Demonstration%20of%20WORLD.jl.ipynb).
