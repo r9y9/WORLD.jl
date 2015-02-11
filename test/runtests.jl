@@ -196,6 +196,43 @@ end
 
 println("WORLD decomposition with aperiodicity and re-synthesis tests passed.")
 
+# spectrum envelop <-> mel-cepstrum conversion
+
+let
+    @assert fs == 16000
+    w = World(fs, 5.0)
+    f0, timeaxis = dio(w, x)
+    f0 = stonemask(w, x, timeaxis, f0)
+    spectrogram = cheaptrick(w, x, timeaxis, f0)
+    spec = spectrogram[:,30]
+
+    α = 0.41
+    fftlen = get_fftsize_for_cheaptrick(fs)
+
+    # check normalized mean squared error
+    approximate_spec = mc2sp(sp2mc(spec, 25, α), α, fftlen)
+    nmse25 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    @test nmse25 <= 0.06
+
+    approximate_spec = mc2sp(sp2mc(spec, 30, α), α, fftlen)
+    nmse30 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    @test nmse30 <= 0.05
+
+    approximate_spec = mc2sp(sp2mc(spec, 40, α), α, fftlen)
+    nmse40 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    @test nmse40 <= 0.03
+
+    @test nmse25 > nmse30 > nmse40
+
+    # For matrix input
+    spec_mat = spectrogram[:,30:31]
+    approximate_spec_mat = mc2sp(sp2mc(spec_mat, 25, α), α, fftlen)
+    @test_approx_eq approximate_spec_mat[:,1] mc2sp(sp2mc(spec_mat[:,1], 25, α), α, fftlen)
+    @test_approx_eq approximate_spec_mat[:,2] mc2sp(sp2mc(spec_mat[:,2], 25, α), α, fftlen)
+end
+
+# get_fftsize
+
 let
     w1 = World(44100, 5.0)
     w2 = World(fs=44100, period=5.0)

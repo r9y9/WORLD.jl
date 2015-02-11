@@ -22,7 +22,12 @@ export
 
     # utils
     get_fftsize_for_star,
-    get_fftsize_for_cheaptrick
+    get_fftsize_for_cheaptrick,
+
+    # conversion
+    sp2mc,  # spectrum envelope to mel-cesptrum
+    mc2sp   # mel-cepstrum to spectrum envelope
+
 
 # Dependency
 deps = joinpath(Pkg.dir("WORLD"), "deps", "deps.jl")
@@ -33,6 +38,7 @@ else
 end
 
 include("bridge.jl")
+include("mcep.jl")
 
 # World is a composite type that holds common settings that are used during
 # analysis
