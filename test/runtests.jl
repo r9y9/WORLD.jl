@@ -223,6 +223,12 @@ let
     @test nmse40 <= 0.03
 
     @test nmse25 > nmse30 > nmse40
+
+    # For matrix input
+    spec_mat = spectrogram[:,30:31]
+    approximate_spec_mat = mc2sp(sp2mc(spec_mat, 25, α), α, fftlen)
+    @test_approx_eq approximate_spec_mat[:,1] mc2sp(sp2mc(spec_mat[:,1], 25, α), α, fftlen)
+    @test_approx_eq approximate_spec_mat[:,2] mc2sp(sp2mc(spec_mat[:,2], 25, α), α, fftlen)
 end
 
 # get_fftsize
