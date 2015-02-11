@@ -213,3 +213,22 @@ for fs in [44100, 48000]
     c = get_fftsize_for_cheaptrick(fs)
     @test s == c == 2048
 end
+
+# DioOption
+
+let
+    try DioOption(); catch @test false; end
+    # f0loor
+    @test_throws ArgumentError DioOption(-1,  100, 2.0, 5.0, 11)
+    @test_throws ArgumentError DioOption(200, 100, 2.0, 5.0, 11)
+    # channels in octave
+    @test_throws ArgumentError DioOption(80.0, 640.0, -1.0, 5.0, 11)
+    # period
+    @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, -1.0, 11)
+    @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 0.0, 11)
+    # speed
+    try DioOption(80.0, 640.0, 2.0, 5.0, 1); catch @test false; end
+    try DioOption(80.0, 640.0, 2.0, 5.0, 12); catch @test false; end
+    @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0)
+    @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 13)
+end

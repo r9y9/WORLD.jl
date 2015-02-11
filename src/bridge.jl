@@ -11,12 +11,37 @@ immutable DioOption
 
     function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
         f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
+        f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
+        if channels_in_octave < 0
+            throw(ArgumentError("channels_in_octave must be positive"))
+        end
+        period <= 0 && throw(ArgumentError("period must be positive"))
+        (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
         new(convert(Float64, f0floor),
             convert(Float64, f0ceil),
             convert(Float64, channels_in_octave),
             convert(Float64, period),
             convert(Int, speed))
     end
+end
+
+# mutable version. used only in initialization
+type MutableDioOption
+    f0floor::Float64
+    f0ceil::Float64
+    channels_in_octave::Float64
+    period::Float64 # ms
+    speed::Int
+end
+
+# Note that the default option assume that the sampling frequency of a input
+# speech signal is 44.1 kHz.
+function DioOption()
+    opt = MutableDioOption(0, 1.0, 1.0, 5.0, 12) # will be overwritten
+    ccall((:InitializeDioOption, libworld),
+          Void, (Ptr{MutableDioOption},), &opt)
+    DioOption(opt.f0floor, opt.f0ceil, opt.channels_in_octave,
+              opt.period, opt.speed)
 end
 
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)
