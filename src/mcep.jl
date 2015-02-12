@@ -32,17 +32,17 @@ function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
 end
 
 # sp2mc converts spectrum envelope to mel-cepstrum
-# |H(ω)| -> cₐ(m)
+# H(ω) -> cₐ(m)
 function sp2mc(spec::AbstractVector,
                order::Int,
                α::FloatingPoint; # all-pass constant
                fftlen::Int=(length(spec)-1)*2
     )
-    # |H(ω)| -> log|H(ω)|²
+    # H(ω) -> log(H(ω)²)
     logperiodogram = 2log(spec)
 
     # transform log-periodogram to real cepstrum
-    # log|H(ω)|² -> c(m)
+    # log(H(ω)²) -> c(m)
     c = real(irfft(logperiodogram, fftlen))
     c[1] /= 2.0
 
@@ -51,7 +51,7 @@ function sp2mc(spec::AbstractVector,
 end
 
 # mc2sp converts mel-cepstrum to spectrum envelope.
-# cₐ(m) -> |H(ω)|
+# cₐ(m) -> H(ω)
 # equivalent: exp(real(MelGeneralizedCepstrums.mgc2sp(mc, α, 0.0, fftlen)))
 function mc2sp{T}(mc::AbstractVector{T}, α::Float64, fftlen::Int)
     # back to cepstrum from mel-cesptrum
@@ -65,8 +65,8 @@ function mc2sp{T}(mc::AbstractVector{T}, α::Float64, fftlen::Int)
         symc[end-i+1] = symc[i+1]
     end
 
-    # back to log spectrum
-    # c(m) -> log|H(ω)|² -> log|H(ω)| -> |H(ω)|
+    # back to spectrum
+    # c(m) -> log(H(ω)²) -> log(H(ω)) -> H(ω)
     exp(real(rfft(symc)) / 2)
 end
 
