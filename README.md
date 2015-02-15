@@ -112,7 +112,9 @@ y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
 
 ![](examples/synthesis_from_aperiodicity.png)
 
-### Conversion between spectrum envelope and mel-cepstrum
+### Compact speech parameterization
+
+Raw spectrum envelop and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1023) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
 
 #### spectrum envelope to mel-cepstrum
 
@@ -131,5 +133,24 @@ approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 ```
 
 ![](examples/envelope_reconstructed_from_melcepstrum.png)
+
+#### aperiodicity spectrum to aperiodicity mel-cesptrum
+
+```julia
+ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
+```
+
+![](examples/aperiodicity_melcepstrum.png)
+
+**NOTE**: HTS v2.3 beta seems to parameterize aperiodicity spectrum in this way (but does this really make sense?).
+
+#### aperiodicity mel-cepstrum to aperiodicity spectrum
+
+```julia
+approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
+```
+
+![](examples/approximate_aperiodicity.png)
+
 
 For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/examples/Demonstration%20of%20WORLD.jl.ipynb).
