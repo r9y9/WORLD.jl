@@ -1,5 +1,9 @@
 # Created by http://www.gitignore.io
 
+### IPythonNotebook ###
+# Temporary data
+.ipynb_checkpoints/
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
