@@ -32,17 +32,17 @@ function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
 end
 
 # sp2mc converts power spectrum envelope to mel-cepstrum
-# X(ω)² -> cₐ(m)
+# |X(ω)|² -> cₐ(m)
 function sp2mc(powerspec::AbstractVector,
                order::Int,
                α::FloatingPoint; # all-pass constant
                fftlen::Int=(length(powerspec)-1)*2
     )
-    # X(ω)² -> log(X(ω)²)
+    # |X(ω)|² -> log(|X(ω)²|)
     logperiodogram = log(powerspec)
 
     # transform log-periodogram to real cepstrum
-    # log(X(ω)²) -> c(m)
+    # log(|X(ω)|²) -> c(m)
     c = real(irfft(logperiodogram, fftlen))
     c[1] /= 2.0
 
@@ -51,7 +51,7 @@ function sp2mc(powerspec::AbstractVector,
 end
 
 # mc2sp converts mel-cepstrum to power spectrum envelope.
-# cₐ(m) -> X(ω)²
+# cₐ(m) -> |X(ω)|²
 # equivalent: exp(2real(MelGeneralizedCepstrums.mgc2sp(mc, α, 0.0, fftlen)))
 # Note that `MelGeneralizedCepstrums.mgc2sp` returns log magnitude spectrum.
 function mc2sp{T}(mc::AbstractVector{T}, α::Float64, fftlen::Int)
@@ -67,7 +67,7 @@ function mc2sp{T}(mc::AbstractVector{T}, α::Float64, fftlen::Int)
     end
 
     # back to power spectrum
-    # c(m) -> log(X(ω)²) -> X(ω)²
+    # c(m) -> log(|X(ω)|²) -> |X(ω)|²
     exp(real(rfft(symc)))
 end
 
