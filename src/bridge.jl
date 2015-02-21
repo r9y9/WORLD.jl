@@ -185,7 +185,7 @@ function aperiodicityratio(x::AbstractVector{Float64}, fs::Integer,
                            f0::AbstractVector{Float64},
                            timeaxis::AbstractVector{Float64})
     fftsize::Int = get_fftsize_for_cheaptrick(fs)
-    freqbins = div(fftsize, 2) + 1
+    freqbins = fftsize>>1 + 1
     aperiodicity = Array(Float64, freqbins, length(f0))
 
     # Array{Float64,2} -> Array{Ptr{Float64}}
