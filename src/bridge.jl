@@ -25,23 +25,16 @@ immutable DioOption
     end
 end
 
-# mutable version. used only in initialization
-type MutableDioOption
-    f0floor::Float64
-    f0ceil::Float64
-    channels_in_octave::Float64
-    period::Float64 # ms
-    speed::Int
-end
-
-# Note that the default option assume that the sampling frequency of a input
+# Note that the default options assume that the sampling frequency of a input
 # speech signal is 44.1 kHz.
-function DioOption()
-    opt = MutableDioOption(0, 1.0, 1.0, 5.0, 12) # will be overwritten
-    ccall((:InitializeDioOption, libworld),
-          Void, (Ptr{MutableDioOption},), &opt)
-    DioOption(opt.f0floor, opt.f0ceil, opt.channels_in_octave,
-              opt.period, opt.speed)
+function DioOption(;
+                   f0floor::Float64=80.0,
+                   f0ceil::Float64=640.0,
+                   channels_in_octave::Float64=2.0,
+                   period::Float64=5.0,
+                   speed::Integer=11
+    )
+    DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
 end
 
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)

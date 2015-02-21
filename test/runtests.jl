@@ -255,6 +255,14 @@ end
 
 let
     try DioOption(); catch @test false; end
+
+    # keyword arguments
+    try DioOption(f0floor=60.0); catch @test false; end
+    try DioOption(f0ceil=600.0); catch @test false; end
+    try DioOption(channels_in_octave=2.0); catch @test false; end
+    try DioOption(period=10.0); catch @test false; end
+    try DioOption(speed=5); catch @test false; end
+
     # f0loor
     @test_throws ArgumentError DioOption(-1,  100, 2.0, 5.0, 11)
     @test_throws ArgumentError DioOption(200, 100, 2.0, 5.0, 11)
