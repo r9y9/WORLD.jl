@@ -37,15 +37,7 @@ All dependencies are resolved with `Pkg.clone` and `Pkg.build`.
 
 ## Usage
 
-### Basic setup
-
-```julia
-w = World(fs, period) # fs might be 16000, 22100 or 44100, period is a frame period in msec.
-```
-
-This is not necessary but might be useful. The composite type `World` just holds sampling frequency and frame period that are used in almost all of WORLD functions. You can call WORLD functions directly as well.
-
-Suppose `x::Vector{Float64}` is a input monoral speech signal like
+In the following examples, suppose `x::Vector{Float64}` is a input monoral speech signal like
 
 ![](examples/x.png)
 
@@ -54,8 +46,8 @@ Suppose `x::Vector{Float64}` is a input monoral speech signal like
 #### DIO
 
 ```julia
-opt = DioOption(80.0, 640, 2.0, period, 4) # f0floor, f0ceil, channels in octave, period, speed
-f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(x, fs, opt=opt)` without using composite type `World`
+opt = DioOption(f0floor=40.0, f0ceil=700.0, channels_in_octave=2.0, period=period, speed=4)
+f0, timeaxis = dio(x, fs, opt)
 ```
 
 ![](examples/f0_by_dio.png)
@@ -63,7 +55,7 @@ f0, timeaxis = dio(w, x, opt=opt) # or you can write `dio(x, fs, opt=opt)` witho
 #### StoneMask
 
 ```julia
-f0 = stonemask(w, x, timeaxis, f0)
+f0 = stonemask(x, fs, timeaxis, f0)
 ```
 
 ![](examples/f0_refinement.png)
@@ -73,7 +65,7 @@ f0 = stonemask(w, x, timeaxis, f0)
 #### CheapTrick
 
 ```julia
-spectrogram = cheaptrick(w, x, timeaxis, f0)
+spectrogram = cheaptrick(x, fs, timeaxis, f0)
 ```
 
 ![](examples/envelope_by_cheaptrick.png)
@@ -83,7 +75,7 @@ spectrogram = cheaptrick(w, x, timeaxis, f0)
 #### Platinum
 
 ```julia
-residual = platinum(w, x, timeaxis, f0, spectrogram)
+residual = platinum(x, fs, timeaxis, f0, spectrogram)
 ```
 
 Note that the result is spectrum of excitation signal.
@@ -91,7 +83,7 @@ Note that the result is spectrum of excitation signal.
 ### Synthesis
 
 ```julia
-y = synthesis(w, f0, spectrogram, residual, length(x))
+y = synthesis(f0, spectrogram, residual, period, fs, length(x))
 ```
 
 ![](examples/synthesis.png)
@@ -99,7 +91,7 @@ y = synthesis(w, f0, spectrogram, residual, length(x))
 ### Aperiodicity ratio estimation
 
 ```julia
-aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
+aperiodicity = aperiodicityratio(x, fs, f0, timeaxis)
 ```
 
 ![](examples/aperiodicity_ratio.png)
@@ -107,7 +99,7 @@ aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
 ### Synthesis from aperiodicity
 
 ```julia
-y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
+ya = synthesis_from_aperiodicity(f0, spectrogram, aperiodicity, period, fs, length(x))
 ```
 
 ![](examples/synthesis_from_aperiodicity.png)
