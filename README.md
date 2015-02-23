@@ -106,7 +106,7 @@ ya = synthesis_from_aperiodicity(f0, spectrogram, aperiodicity, period, fs, leng
 
 ### Compact speech parameterization
 
-Raw spectrum envelop and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1023) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
+Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1023) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
 
 #### spectrum envelope to mel-cepstrum
 
