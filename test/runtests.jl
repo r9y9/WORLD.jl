@@ -105,7 +105,7 @@ function test_synthesis(x::AbstractArray, fs::Int=44100, period::Float64=5.0,
     @test !any(isnan(residual))
 
     # Sysnthesis from f0, spectral envelope and residual spectrogram.
-    y_length = int((length(f0)-1)*period/1000 * fs) + 1
+    y_length = convert(Int, (length(f0)-1)*period/1000 * fs + 1)
     y = synthesis(w, f0, spectrogram, residual, y_length)
     @test !any(isnan(y))
 
@@ -151,7 +151,7 @@ function test_aperiodicity_synthesis(x::AbstractArray, fs::Int=44100,
     @test !any(isnan(aperiodicity))
 
     # Sysnthesis from f0, spectral envelope and aperiodicity ratio.
-    y_length = int((length(f0)-1)*period/1000 * fs) + 1
+    y_length = convert(Int, (length(f0)-1)*period/1000 * fs + 1)
     y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, length(x))
     @test !any(isnan(y))
 
@@ -169,7 +169,7 @@ x, fs = wavread(fpath)
 @assert size(x, 2) == 1 "The input data must be monoral."
 @assert !any(isnan(x))
 x = vec(x)
-fs = int(fs)
+fs = convert(Int, fs)
 
 for period in [5.0, 7.0, 10.0]
     test_dio(x, fs, period)

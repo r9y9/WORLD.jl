@@ -49,7 +49,7 @@ println("Maximum error in aperiodicy is $(maximum(abs(aperiodicity-aperiodicity_
 @test_approx_eq_eps aperiodicity aperiodicity_org 1.0e-10
 
 # Synthesis
-y_length = int((length(f0)-1)*period/1000 * fs) + 1
+y_length = convert(Int, ((length(f0)-1)*period/1000 * fs) + 1)
 y = synthesis(w, f0, spectrogram, residual, y_length)
 y_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x_synthesized.txt")))
 println("Maximum error in synthesis is $(maximum(abs(y-y_org)))")
