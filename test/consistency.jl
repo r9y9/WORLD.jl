@@ -10,7 +10,7 @@ x = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x.txt")))
 fs = 16000
 period = 5.0
 w = World(fs, period)
-opt = DioOption(80.0, 640.0, 2, period, 12)
+opt = DioOption(71.0, 800.0, 2, period, 1)
 
 # Fundamental frequency (f0) estimation by DIO
 f0, timeaxis = dio(w, x; opt=opt)
@@ -36,29 +36,16 @@ println("Maximum error in CheapTrick is $(maximum(abs(spectrogram - spectrogram_
 @test size(spectrogram) == size(spectrogram_org)
 @test_approx_eq_eps spectrogram spectrogram_org 1.0e-10
 
-residual = platinum(w, x, timeaxis, f0, spectrogram)
-residual_org = readdlm(joinpath(dirname(@__FILE__), "data", "residual_spectrogram.txt"))'
-println("Maximum error in Platinum is $(maximum(abs(residual-residual_org)))")
-@test size(residual) == size(residual_org)
-@test_approx_eq_eps residual residual_org 1.0e-10
-
-aperiodicity = aperiodicityratio(w, x, f0, timeaxis)
+aperiodicity = d4c(w, x, timeaxis, f0)
 aperiodicity_org = readdlm(joinpath(dirname(@__FILE__), "data", "aperiodicity.txt"))'
-println("Maximum error in aperiodicy is $(maximum(abs(aperiodicity-aperiodicity_org)))")
+println("Maximum error in D4C is $(maximum(abs(aperiodicity-aperiodicity_org)))")
 @test size(aperiodicity) == size(aperiodicity)
 @test_approx_eq_eps aperiodicity aperiodicity_org 1.0e-10
 
 # Synthesis
 y_length = convert(Int, ((length(f0)-1)*period/1000 * fs) + 1)
-y = synthesis(w, f0, spectrogram, residual, y_length)
+y = synthesis(w, f0, spectrogram, aperiodicity, y_length)
 y_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x_synthesized.txt")))
-println("Maximum error in synthesis is $(maximum(abs(y-y_org)))")
-@test length(y) == length(y_org)
-@test_approx_eq_eps y y_org 1.0e-10
-
-# Synthesis from aperiodicy
-y = synthesis_from_aperiodicity(w, f0, spectrogram, aperiodicity, y_length)
-y_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x_synthesized_from_aperiodicity.txt")))
-println("Maximum error in synthesis_from_aperiodicy is $(maximum(abs(y-y_org)))")
+println("Maximum error in Synthesis is $(maximum(abs(y-y_org)))")
 @test length(y) == length(y_org)
 @test_approx_eq_eps y y_org 1.0e-10
