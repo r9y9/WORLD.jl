@@ -28,11 +28,11 @@ end
 # Note that the default options assume that the sampling frequency of a input
 # speech signal is 44.1 kHz.
 function DioOption(;
-                   f0floor::Float64=80.0,
-                   f0ceil::Float64=640.0,
+                   f0floor::Float64=71.0,
+                   f0ceil::Float64=800.0,
                    channels_in_octave::Float64=2.0,
                    period::Float64=5.0,
-                   speed::Integer=11
+                   speed::Integer=1
     )
     DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
 end
@@ -42,7 +42,7 @@ function get_samples_for_dio(fs::Real, len::Integer, period::Real)
           (Int, Int, Float64), fs, len, period)
 end
 
-function dio(x::AbstractVector{Float64}, fs::Real, opt::DioOption)
+function dio(x::AbstractVector{Float64}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array(Float64, expectedlen)
     timeaxis = Array(Float64, expectedlen)
