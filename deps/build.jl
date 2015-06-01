@@ -6,7 +6,7 @@ deps = [
         world = library_dependency("libworld")
         ]
 
-const version = "0.1.4_2_1"
+const version = "0.2.0_1"
 
 provides(Sources,
          URI("https://github.com/r9y9/WORLD/archive/v$(version).tar.gz"),

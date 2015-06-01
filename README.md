@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/r9y9/WORLD.jl.svg?branch=master)](https://travis-ci.org/r9y9/WORLD.jl)
 [![Coverage Status](https://coveralls.io/repos/r9y9/WORLD.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/WORLD.jl?branch=master)
 
-WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, modification and synthesis system. WORLD provides a way to decompose a speech signal into
+WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, manipulation and synthesis system. WORLD provides a way to decompose a speech signal into
 
 - Fundamental frequency (F0)
 - spectral envelope
-- excitation signal (or aperiodicy used in TANDEM-STRAIGHT)
+- aperiodicy
 
 and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
 
@@ -60,9 +60,7 @@ f0 = stonemask(x, fs, timeaxis, f0)
 
 ![](examples/f0_refinement.png)
 
-### Spectral envelope estimation
-
-#### CheapTrick
+### Spectral envelope estimation by CheapTrick
 
 ```julia
 spectrogram = cheaptrick(x, fs, timeaxis, f0)
@@ -70,39 +68,21 @@ spectrogram = cheaptrick(x, fs, timeaxis, f0)
 
 ![](examples/envelope_by_cheaptrick.png)
 
-### Excitation signal estimation
-
-#### Platinum
+### Aperiodicity ratio estimation by D4C
 
 ```julia
-residual = platinum(x, fs, timeaxis, f0, spectrogram)
+aperiodicity = d4c(x, fs, timeaxis, f0)
 ```
 
-Note that the result is spectrum of excitation signal.
+![](examples/aperiodicity_by_d4c.png)
 
 ### Synthesis
 
 ```julia
-y = synthesis(f0, spectrogram, residual, period, fs, length(x))
+y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
 ```
 
 ![](examples/synthesis.png)
-
-### Aperiodicity ratio estimation
-
-```julia
-aperiodicity = aperiodicityratio(x, fs, f0, timeaxis)
-```
-
-![](examples/aperiodicity_ratio.png)
-
-### Synthesis from aperiodicity
-
-```julia
-ya = synthesis_from_aperiodicity(f0, spectrogram, aperiodicity, period, fs, length(x))
-```
-
-![](examples/synthesis_from_aperiodicity.png)
 
 ### Compact speech parameterization
 
@@ -143,6 +123,5 @@ approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
 ```
 
 ![](examples/approximate_aperiodicity.png)
-
 
 For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/examples/Demonstration%20of%20WORLD.jl.ipynb).
