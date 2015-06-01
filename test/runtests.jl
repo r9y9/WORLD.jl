@@ -1,6 +1,5 @@
 using WORLD
 using Base.Test
-using WAV
 
 # Check consistency of the results between WORLD and WORLD.jl.
 # Due to the results of the WORLD were dumped (see ./data) on linux,
@@ -82,12 +81,8 @@ function test_synthesis(x::AbstractArray, fs::Int=44100,
 end
 
 # Read test data (male)
-fpath = joinpath(Pkg.dir("WORLD"), "test", "data", "test16k.wav")
-x, fs = wavread(fpath)
-@assert size(x, 2) == 1 "The input data must be monoral."
-@assert !any(isnan(x))
-x = vec(x)
-fs = convert(Int, fs)
+x = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x.txt")))
+fs = 16000
 
 for period in [5.0, 7.0, 10.0]
     test_dio(x, fs, period)
