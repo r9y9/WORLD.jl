@@ -31,5 +31,6 @@ end
 
 include("bridge.jl")
 include("mcep.jl")
+include("deprecated.jl")
 
 end # module WORLD
