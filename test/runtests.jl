@@ -170,3 +170,10 @@ let
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0)
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 13)
 end
+
+# deprecated
+
+let
+    f0, timeaxis = dio(x, fs)
+    @test_throws Exception platinum(x, fs, timeaxis, f0)
+end
