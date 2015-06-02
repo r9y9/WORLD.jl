@@ -171,6 +171,31 @@ let
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 13)
 end
 
+# matlabfunctions
+
+let
+    opt = DioOption(71.0, 800.0, 2, 5.0, 1)
+    f0, timeaxis = dio(x, fs, opt)
+    spectrogram = cheaptrick(x, fs, timeaxis, f0)
+
+    logspec = log(spectrogram[:,100])
+    fftsize = get_fftsize_for_cheaptrick(fs)
+
+    freqaxis_src = [1:(fftsize>>1+1)] / fftsize * fs
+    freqaxis_dst = freqaxis_src .* 2/3
+
+    # spectral stretching
+    interpolated_logspec = interp1(freqaxis_src, logspec, freqaxis_dst)
+    @test !any(isnan(interpolated_logspec))
+
+    interpolated_spec = exp(interpolated_logspec)
+
+    interpolated_logspec2 = similar(logspec)
+    interp1!(freqaxis_src, logspec, freqaxis_dst, interpolated_logspec2)
+    @test interpolated_logspec == interpolated_logspec2
+end
+
+
 # deprecated
 
 let

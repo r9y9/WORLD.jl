@@ -17,6 +17,10 @@ export
     # utils
     get_fftsize_for_cheaptrick,
 
+    # matlabfunctions
+    interp1!,
+    interp1,
+
     # conversion
     sp2mc,  # spectrum envelope to mel-cesptrum
     mc2sp   # mel-cepstrum to spectrum envelope

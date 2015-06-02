@@ -144,3 +144,24 @@ function synthesis(f0::AbstractVector{Float64},
 
     synthesized
 end
+
+# matlabfunctions
+
+function interp1!(x::AbstractVector{Float64},
+                  y::AbstractVector{Float64},
+                  xi::AbstractVector{Float64},
+                  yi::AbstractVector{Float64})
+    @assert length(x) == length(y)
+    @assert length(xi) == length(yi)
+    ccall((:interp1, libworld), Void,
+          (Ptr{Float64}, Ptr{Float64}, Int, Ptr{Float64}, Int, Ptr{Float64}),
+          x, y, length(x), xi, length(xi), yi)
+    yi
+end
+
+function interp1(x::AbstractVector{Float64},
+                 y::AbstractVector{Float64},
+                 xi::AbstractVector{Float64})
+    yi = similar(xi)
+    interp1!(x, y, xi, yi)
+end
