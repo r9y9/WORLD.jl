@@ -46,7 +46,7 @@ In the following examples, suppose `x::Vector{Float64}` is a input monoral speec
 #### DIO
 
 ```julia
-opt = DioOption(f0floor=40.0, f0ceil=700.0, channels_in_octave=2.0, period=period, speed=4)
+opt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0, period=period, speed=1)
 f0, timeaxis = dio(x, fs, opt)
 ```
 
