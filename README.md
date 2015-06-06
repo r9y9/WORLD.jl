@@ -7,7 +7,7 @@ WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, manipula
 
 - Fundamental frequency (F0)
 - spectral envelope
-- aperiodicy
+- aperiodicity
 
 and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
 
