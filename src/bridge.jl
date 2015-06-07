@@ -1,27 +1,47 @@
 @assert isdefined(:libworld)
 
-# DioOption represents a set of options that is used in DIO,
-# a fundamental frequency analysis.
-immutable DioOption
-    f0floor::Float64
-    f0ceil::Float64
-    channels_in_octave::Float64
-    period::Float64 # ms
-    speed::Int
+if version >= v"0.2.1-2"
+    # DioOption represents a set of options that is used in DIO,
+    # a fundamental frequency analysis.
+    immutable DioOption
+        f0floor::Float64
+        f0ceil::Float64
+        channels_in_octave::Float64
+        period::Float64 # ms
+        speed::Int
+        allowed_range::Float64 # added in v0.2.1-2 (WORLD 0.2.0_2)
 
-    function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
-        f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
-        f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
-        if channels_in_octave < 0
-            throw(ArgumentError("channels_in_octave must be positive"))
+        function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
+                           allowed_range = 0.02 * period)
+            f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
+            f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
+            if channels_in_octave < 0
+                throw(ArgumentError("channels_in_octave must be positive"))
+            end
+            period <= 0 && throw(ArgumentError("period must be positive"))
+            (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
+            allowed_range >= 0 || throw(ArgumentError("allowed_range >= 0 is supported"))
+            new(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
         end
-        period <= 0 && throw(ArgumentError("period must be positive"))
-        (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
-        new(convert(Float64, f0floor),
-            convert(Float64, f0ceil),
-            convert(Float64, channels_in_octave),
-            convert(Float64, period),
-            convert(Int, speed))
+    end
+else
+    immutable DioOption
+        f0floor::Float64
+        f0ceil::Float64
+        channels_in_octave::Float64
+        period::Float64 # ms
+        speed::Int
+
+        function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
+            f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
+            f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
+            if channels_in_octave < 0
+                throw(ArgumentError("channels_in_octave must be positive"))
+            end
+            period <= 0 && throw(ArgumentError("period must be positive"))
+            (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
+            new(f0floor, f0ceil, channels_in_octave, period, speed)
+        end
     end
 end
 
@@ -32,9 +52,14 @@ function DioOption(;
                    f0ceil::Float64=800.0,
                    channels_in_octave::Float64=2.0,
                    period::Float64=5.0,
-                   speed::Integer=1
-    )
-    DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
+                   speed::Integer=1,
+                   allowed_range::Float64=0.02
+                   )
+    if version >= v"0.2.1-2"
+        DioOption(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
+    else
+        DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
+    end
 end
 
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)

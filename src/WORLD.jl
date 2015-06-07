@@ -33,6 +33,34 @@ else
     error("WORLD not properly installed. Please run Pkg.build(\"WORLD\")")
 end
 
+try
+    # function GetWORLDVersion was added in v0.2.1-2
+    versionstr = bytestring(ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ()))
+    global const version = convert(VersionNumber, versionstr)
+catch e
+    try
+        ccall((:GetFFTSizeForStar, libworld), Int, (Int,), 48000)
+        global const version = v"0.1.4"
+    catch e
+        global const version = v"0.2.0"
+    end
+end
+
+if version < v"0.2.0"
+    warn("""WORLD version incompatibility
+
+         WORLD version 0.2.0 or later is recommended, but the detected version
+         is $(version)). If you have WORLD installed, please get the latest
+         stable WORLD and upgrade it, or re-build WORLD.jl with the following
+         commands from REPL:
+
+         julia> rm(joinpath(Pkg.dir(\"WORLD\"),  \"deps\", \"deps.jl\"))
+         julia> Pkg.build(\"WORLD\")
+
+         This should install the proper version of WORLD.
+         """)
+end
+
 include("bridge.jl")
 include("mcep.jl")
 include("deprecated.jl")
