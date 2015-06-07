@@ -4,7 +4,6 @@ module WORLD
 
 export
     # Types
-    World,
     DioOption,
 
     # World methods
