@@ -1,6 +1,8 @@
 using WORLD
 using Base.Test
 
+@show WORLD.version
+
 # Check consistency of the results between WORLD and WORLD.jl.
 # Due to the results of the WORLD were dumped (see ./data) on linux,
 # we test consistency only on linux.
@@ -169,6 +171,12 @@ let
     try DioOption(80.0, 640.0, 2.0, 5.0, 12); catch @test false; end
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0)
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 13)
+    # allowed_range
+    if WORLD.version >= v"0.2.1-2"
+        try DioOption(allowed_range=0.1); catch @test false; end
+        try DioOption(71.0, 800.0, 2.0, 5.0, 1, 0.0); catch @test false; end
+        @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0, -1.0)
+    end
 end
 
 # matlabfunctions

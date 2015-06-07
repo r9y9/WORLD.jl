@@ -9,7 +9,11 @@ x = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x.txt")))
 
 fs = 16000
 period = 5.0
-opt = DioOption(71.0, 800.0, 2, period, 1)
+if WORLD.version >= v"0.2.1-2"
+    opt = DioOption(71.0, 800.0, 2, period, 1, 0.1) # 0.1 = 0.02 * 5.0
+else
+    opt = DioOption(71.0, 800.0, 2, period, 1)
+end
 
 # Fundamental frequency (f0) estimation by DIO
 f0, timeaxis = dio(x, fs, opt)
