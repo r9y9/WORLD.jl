@@ -1,4 +1,5 @@
 using BinDeps
+using Compat
 
 @BinDeps.setup
 
@@ -27,4 +28,4 @@ provides(SimpleBuild,
               end
            end), world, os = :Unix)
 
-@BinDeps.install [:libworld => :libworld]
+@BinDeps.install @compat Dict(:libworld => :libworld)
