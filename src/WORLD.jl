@@ -38,7 +38,7 @@ try
     global const version = convert(VersionNumber, versionstr)
 catch e
     try
-        ccall((:GetFFTSizeForStar, libworld), Int, (Int,), 48000)
+        ccall((:GetFFTSizeForStar, libworld), Cint, (Cint,), 48000)
         global const version = v"0.1.4"
     catch e
         global const version = v"0.2.0"

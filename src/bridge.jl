@@ -4,12 +4,12 @@ if version >= v"0.2.1-2"
     # DioOption represents a set of options that is used in DIO,
     # a fundamental frequency analysis.
     immutable DioOption
-        f0floor::Float64
-        f0ceil::Float64
-        channels_in_octave::Float64
-        period::Float64 # ms
-        speed::Int
-        allowed_range::Float64 # added in v0.2.1-2 (WORLD 0.2.0_2)
+        f0floor::Cdouble
+        f0ceil::Cdouble
+        channels_in_octave::Cdouble
+        period::Cdouble # ms
+        speed::Cint
+        allowed_range::Cdouble # added in v0.2.1-2 (WORLD 0.2.0_2)
 
         function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
                            allowed_range = 0.02 * period)
@@ -26,11 +26,11 @@ if version >= v"0.2.1-2"
     end
 else
     immutable DioOption
-        f0floor::Float64
-        f0ceil::Float64
-        channels_in_octave::Float64
-        period::Float64 # ms
-        speed::Int
+        f0floor::Cdouble
+        f0ceil::Cdouble
+        channels_in_octave::Cdouble
+        period::Cdouble # ms
+        speed::Cint
 
         function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
             f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
@@ -63,28 +63,28 @@ function DioOption(;
 end
 
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)
-    ccall((:GetSamplesForDIO, libworld), Int,
-          (Int, Int, Float64), fs, len, period)
+    ccall((:GetSamplesForDIO, libworld), Cint,
+          (Cint, Cint, Cdouble), fs, len, period)
 end
 
-function dio(x::AbstractVector{Float64}, fs::Real, opt::DioOption=DioOption())
+function dio(x::AbstractVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
-    f0 = Array(Float64, expectedlen)
-    timeaxis = Array(Float64, expectedlen)
+    f0 = Array(Cdouble, expectedlen)
+    timeaxis = Array(Cdouble, expectedlen)
     # Note that value passinig of julia-type to C-struct doesn't work.
     ccall((:DioByOptPtr, libworld),  Void,
-          (Ptr{Float64}, Int64, Int64, Ptr{DioOption}, Ptr{Float64}, Ptr{Float64}),
+          (Ptr{Cdouble}, Cint, Cint, Ptr{DioOption}, Ptr{Cdouble}, Ptr{Cdouble}),
           x, length(x), fs, &opt, timeaxis, f0)
     f0, timeaxis
 end
 
-function stonemask(x::AbstractVector{Float64}, fs::Integer,
-                   timeaxis::AbstractVector{Float64},
-                   f0::AbstractVector{Float64})
-    refinedF0 = Array(Float64, length(f0))
+function stonemask(x::AbstractVector{Cdouble}, fs::Integer,
+                   timeaxis::AbstractVector{Cdouble},
+                   f0::AbstractVector{Cdouble})
+    refinedF0 = Array(Cdouble, length(f0))
     ccall((:StoneMask, libworld),  Void,
-          (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int,
-           Ptr{Float64}),
+          (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
+           Ptr{Cdouble}),
           x, length(x), fs, timeaxis, f0, length(f0), refinedF0)
     refinedF0
 end
@@ -97,25 +97,26 @@ function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
 end
 
 function get_fftsize_for_cheaptrick(fs::Integer)
-    ccall((:GetFFTSizeForCheapTrick, libworld), Int, (Int,), fs)
+    fftsize = ccall((:GetFFTSizeForCheapTrick, libworld), Cint, (Cint,), fs)
+    convert(Int, fftsize)
 end
 
-function cheaptrick(x::AbstractVector{Float64}, fs::Integer,
-                    timeaxis::AbstractVector{Float64},
-                    f0::AbstractVector{Float64})
+function cheaptrick(x::AbstractVector{Cdouble}, fs::Integer,
+                    timeaxis::AbstractVector{Cdouble},
+                    f0::AbstractVector{Cdouble})
     freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
-    spectrogram = Array(Float64, freqbins, length(f0))
+    spectrogram = Array(Cdouble, freqbins, length(f0))
 
-    # Array{Float64,2} -> Array{Ptr{Float64}}
-    cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
+    # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
+    cspectrogram = Array(Ptr{Cdouble}, size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
     ccall((:CheapTrick, libworld), Void,
-          (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int64,
-           Ptr{Ptr{Float64}}),
+          (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
+           Ptr{Ptr{Cdouble}}),
           x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
 
-    # Array{Float64,2} <- Array{Ptr{Float64}}
+    # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
     for i=1:length(f0), j=1:freqbins
         @inbounds spectrogram[j,i] = unsafe_load(cspectrogram[i], j)
     end
@@ -123,23 +124,23 @@ function cheaptrick(x::AbstractVector{Float64}, fs::Integer,
     spectrogram
 end
 
-function d4c(x::AbstractVector{Float64}, fs::Integer,
-             timeaxis::AbstractVector{Float64},
-             f0::AbstractVector{Float64})
+function d4c(x::AbstractVector{Cdouble}, fs::Integer,
+             timeaxis::AbstractVector{Cdouble},
+             f0::AbstractVector{Cdouble})
     fftsize = get_fftsize_for_cheaptrick(fs)
     freqbins = fftsize>>1 + 1
-    aperiodicity = zeros(Float64, freqbins, length(f0))
+    aperiodicity = zeros(Cdouble, freqbins, length(f0))
 
-    # Array{Float64,2} -> Array{Ptr{Float64}}
-    caperiodicity = Array(Ptr{Float64}, size(aperiodicity, 2))
+    # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
+    caperiodicity = Array(Ptr{Cdouble}, size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
     ccall((:D4C, libworld), Void,
-          (Ptr{Float64}, Int64, Int64, Ptr{Float64}, Ptr{Float64}, Int, Int64,
-           Ptr{Ptr{Float64}}),
+          (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint, Cint,
+           Ptr{Ptr{Cdouble}}),
           x, length(x), fs, timeaxis, f0, length(f0), fftsize, caperiodicity)
 
-    # Array{Float64,2} <- Array{Ptr{Float64}}
+    # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
     for i=1:length(f0), j=1:freqbins
         aperiodicity[j,i] = unsafe_load(caperiodicity[i], j)
     end
@@ -147,23 +148,23 @@ function d4c(x::AbstractVector{Float64}, fs::Integer,
     aperiodicity
 end
 
-function synthesis(f0::AbstractVector{Float64},
-                   spectrogram::AbstractMatrix{Float64},
-                   aperiodicity::AbstractMatrix{Float64},
+function synthesis(f0::AbstractVector{Cdouble},
+                   spectrogram::AbstractMatrix{Cdouble},
+                   aperiodicity::AbstractMatrix{Cdouble},
                    period::Real, fs::Integer, len::Integer)
     fftsize = get_fftsize_for_cheaptrick(fs)
 
-    # Array{Float64,2} -> Array{Ptr{Float64}}
-    cspectrogram = Array(Ptr{Float64}, size(spectrogram, 2))
+    # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
+    cspectrogram = Array(Ptr{Cdouble}, size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
-    caperiodicity = Array(Ptr{Float64}, size(aperiodicity, 2))
+    caperiodicity = Array(Ptr{Cdouble}, size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    synthesized = Array(Float64, len)
+    synthesized = Array(Cdouble, len)
     ccall((:Synthesis, libworld), Void,
-          (Ptr{Float64}, Int64, Ptr{Ptr{Float64}}, Ptr{Ptr{Float64}},
-           Int64, Float64, Int64, Int64, Ptr{Float64}),
+          (Ptr{Cdouble}, Cint, Ptr{Ptr{Cdouble}}, Ptr{Ptr{Cdouble}},
+           Cint, Cdouble, Cint, Cint, Ptr{Cdouble}),
           f0, length(f0), cspectrogram, caperiodicity, fftsize, period, fs, len,
           synthesized)
 
@@ -172,21 +173,21 @@ end
 
 # matlabfunctions
 
-function interp1!(x::AbstractVector{Float64},
-                  y::AbstractVector{Float64},
-                  xi::AbstractVector{Float64},
-                  yi::AbstractVector{Float64})
+function interp1!(x::AbstractVector{Cdouble},
+                  y::AbstractVector{Cdouble},
+                  xi::AbstractVector{Cdouble},
+                  yi::AbstractVector{Cdouble})
     @assert length(x) == length(y)
     @assert length(xi) == length(yi)
     ccall((:interp1, libworld), Void,
-          (Ptr{Float64}, Ptr{Float64}, Int, Ptr{Float64}, Int, Ptr{Float64}),
+          (Ptr{Cdouble}, Ptr{Cdouble}, Cint, Ptr{Cdouble}, Cint, Ptr{Cdouble}),
           x, y, length(x), xi, length(xi), yi)
     yi
 end
 
-function interp1(x::AbstractVector{Float64},
-                 y::AbstractVector{Float64},
-                 xi::AbstractVector{Float64})
+function interp1(x::AbstractVector{Cdouble},
+                 y::AbstractVector{Cdouble},
+                 xi::AbstractVector{Cdouble})
     yi = similar(xi)
     interp1!(x, y, xi, yi)
 end
