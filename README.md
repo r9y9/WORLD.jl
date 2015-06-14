@@ -1,6 +1,7 @@
 # WORLD.jl
 
 [![Build Status](https://travis-ci.org/r9y9/WORLD.jl.svg?branch=master)](https://travis-ci.org/r9y9/WORLD.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/j6xrcx8s6wyahacs?svg=true)](https://ci.appveyor.com/project/r9y9/world-jl)
 [![Coverage Status](https://coveralls.io/repos/r9y9/WORLD.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/WORLD.jl?branch=master)
 [![WORLD](http://pkg.julialang.org/badges/WORLD_release.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=release)
 
@@ -16,8 +17,7 @@ and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.
 
 - Linux
 - Mac OS X
-
-Note that the original WORLD works in windows as well. In order to use WORLD.jl in windows, you have to build WORLD yourself since currently we don't have a installation script.
+- Windows
 
 ## Installation
 

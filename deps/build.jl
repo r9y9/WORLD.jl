@@ -3,14 +3,19 @@ using Compat
 
 @BinDeps.setup
 
-deps = [
-        world = library_dependency("libworld")
-        ]
+world = library_dependency("libworld", aliases=["libworld", "world-0"])
 
 const version = "0.2.1-2"
 
+github_root = "https://github.com/r9y9/WORLD"
+arch = WORD_SIZE == 64 ? "x86_64" : "i686"
+major = version[1]
+provides(Binaries,
+         URI("$(github_root)/releases/download/v$(version)/world-$(major)_mingw$(WORD_SIZE)_$(arch).zip"),
+         world, unpacked_dir = "usr/lib", os = :Windows)
+
 provides(Sources,
-         URI("https://github.com/r9y9/WORLD/archive/v$(version).tar.gz"),
+         URI("$(github_root)/archive/v$(version).tar.gz"),
          world,
          unpacked_dir="WORLD-$(version)")
 
