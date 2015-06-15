@@ -1,11 +1,5 @@
 # deprecates related to the version up from WORLD v0.1.4 to v0.2.0
 
-export
-    star,
-    platinum,
-    aperiodicityratio,
-    synthesis_from_aperiodicity
-
 # Since `libworld.0.2.0` doesn't provide an interface to Platinum,
 # I decided `platinum` simply throws an error for deprecation.
 function platinum(x, fs, timeaxis, f0, spectrogram)

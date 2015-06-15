@@ -6,7 +6,7 @@ export
     # Types
     DioOption,
 
-    # World methods
+    # WORLD functions
     dio,
     stonemask,
     cheaptrick,
@@ -16,7 +16,7 @@ export
     # utils
     get_fftsize_for_cheaptrick,
 
-    # matlabfunctions
+    # matlab functions
     interp1!,
     interp1,
 
