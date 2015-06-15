@@ -189,7 +189,7 @@ let
     logspec = log(spectrogram[:,100])
     fftsize = get_fftsize_for_cheaptrick(fs)
 
-    freqaxis_src = [1:(fftsize>>1+1)] / fftsize * fs
+    freqaxis_src = collect(1:(fftsize>>1+1)) / fftsize * fs
     freqaxis_dst = freqaxis_src .* 2/3
 
     # spectral stretching
