@@ -4,6 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/j6xrcx8s6wyahacs?svg=true)](https://ci.appveyor.com/project/r9y9/world-jl)
 [![Coverage Status](https://coveralls.io/repos/r9y9/WORLD.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/WORLD.jl?branch=master)
 [![WORLD](http://pkg.julialang.org/badges/WORLD_release.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=release)
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
 WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, manipulation and synthesis system. WORLD provides a way to decompose a speech signal into
 
