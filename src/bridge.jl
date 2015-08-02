@@ -67,7 +67,7 @@ function get_samples_for_dio(fs::Real, len::Integer, period::Real)
           (Cint, Cint, Cdouble), fs, len, period)
 end
 
-function dio(x::AbstractVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
+function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array(Cdouble, expectedlen)
     timeaxis = Array(Cdouble, expectedlen)
@@ -78,9 +78,9 @@ function dio(x::AbstractVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     f0, timeaxis
 end
 
-function stonemask(x::AbstractVector{Cdouble}, fs::Integer,
-                   timeaxis::AbstractVector{Cdouble},
-                   f0::AbstractVector{Cdouble})
+function stonemask(x::StridedVector{Cdouble}, fs::Integer,
+                   timeaxis::StridedVector{Cdouble},
+                   f0::StridedVector{Cdouble})
     refinedF0 = Array(Cdouble, length(f0))
     ccall((:StoneMask, libworld),  Void,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
@@ -101,9 +101,9 @@ function get_fftsize_for_cheaptrick(fs::Integer)
     convert(Int, fftsize)
 end
 
-function cheaptrick(x::AbstractVector{Cdouble}, fs::Integer,
-                    timeaxis::AbstractVector{Cdouble},
-                    f0::AbstractVector{Cdouble})
+function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
+                    timeaxis::StridedVector{Cdouble},
+                    f0::StridedVector{Cdouble})
     freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
     spectrogram = Array(Cdouble, freqbins, length(f0))
 
@@ -124,9 +124,9 @@ function cheaptrick(x::AbstractVector{Cdouble}, fs::Integer,
     spectrogram
 end
 
-function d4c(x::AbstractVector{Cdouble}, fs::Integer,
-             timeaxis::AbstractVector{Cdouble},
-             f0::AbstractVector{Cdouble})
+function d4c(x::StridedVector{Cdouble}, fs::Integer,
+             timeaxis::StridedVector{Cdouble},
+             f0::StridedVector{Cdouble})
     fftsize = get_fftsize_for_cheaptrick(fs)
     freqbins = fftsize>>1 + 1
     aperiodicity = zeros(Cdouble, freqbins, length(f0))
@@ -148,9 +148,9 @@ function d4c(x::AbstractVector{Cdouble}, fs::Integer,
     aperiodicity
 end
 
-function synthesis(f0::AbstractVector{Cdouble},
-                   spectrogram::AbstractMatrix{Cdouble},
-                   aperiodicity::AbstractMatrix{Cdouble},
+function synthesis(f0::StridedVector{Cdouble},
+                   spectrogram::StridedMatrix{Cdouble},
+                   aperiodicity::StridedMatrix{Cdouble},
                    period::Real, fs::Integer, len::Integer)
     fftsize = get_fftsize_for_cheaptrick(fs)
 
@@ -173,10 +173,10 @@ end
 
 # matlabfunctions
 
-function interp1!(x::AbstractVector{Cdouble},
-                  y::AbstractVector{Cdouble},
-                  xi::AbstractVector{Cdouble},
-                  yi::AbstractVector{Cdouble})
+function interp1!(x::StridedVector{Cdouble},
+                  y::StridedVector{Cdouble},
+                  xi::StridedVector{Cdouble},
+                  yi::StridedVector{Cdouble})
     @assert length(x) == length(y)
     @assert length(xi) == length(yi)
     ccall((:interp1, libworld), Void,
@@ -185,9 +185,9 @@ function interp1!(x::AbstractVector{Cdouble},
     yi
 end
 
-function interp1(x::AbstractVector{Cdouble},
-                 y::AbstractVector{Cdouble},
-                 xi::AbstractVector{Cdouble})
+function interp1(x::StridedVector{Cdouble},
+                 y::StridedVector{Cdouble},
+                 xi::StridedVector{Cdouble})
     yi = similar(xi)
     interp1!(x, y, xi, yi)
 end
