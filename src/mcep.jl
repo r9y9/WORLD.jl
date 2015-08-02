@@ -77,13 +77,11 @@ for f in [:sp2mc,
           ]
     @eval begin
         function $f(x::AbstractMatrix, args...; kargs...)
-            r = $f(x[:, 1], args...; kargs...)
-            ret = Array(eltype(r), size(r, 1), size(x, 2))
-            for i = 1:length(r)
-                @inbounds ret[i, 1] = r[i]
-            end
+            outbuf = $f(sub(x, :, 1), args...; kargs...)
+            ret = Array(eltype(outbuf), length(outbuf), size(x, 2))
+            copy!(ret, 1, outbuf, 1, length(outbuf))
             for i = 2:size(x, 2)
-                @inbounds ret[:, i] = $f(x[:, i], args...; kargs...)
+                @inbounds ret[:, i] = $f(sub(x, :, i), args...; kargs...)
             end
             ret
         end
