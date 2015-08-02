@@ -12,7 +12,7 @@ if version >= v"0.2.1-2"
         allowed_range::Cdouble # added in v0.2.1-2 (WORLD 0.2.0_2)
 
         function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
-                           allowed_range = 0.02 * period)
+                           allowed_range = 0.1)
             f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
             f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
             if channels_in_octave < 0
@@ -53,7 +53,7 @@ function DioOption(;
                    channels_in_octave::Float64=2.0,
                    period::Float64=5.0,
                    speed::Integer=1,
-                   allowed_range::Float64=0.02
+                   allowed_range::Float64=0.1
                    )
     if version >= v"0.2.1-2"
         DioOption(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
