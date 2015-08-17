@@ -50,15 +50,14 @@ end
 if version < v"0.2.0"
     warn("""WORLD version incompatibility
 
-         WORLD version 0.2.0 or later is recommended, but the detected version
-         is $(version)). If you have WORLD installed, please get the latest
-         stable WORLD and upgrade it, or re-build WORLD.jl with the following
-         commands from REPL:
+         WORLD version 0.2.0 or later is recommended but $(version) is detected.
+         If you have WORLD installed on system path, please get the latest
+         stable WORLD and install it, and then re-build WORLD.jl with:
 
-         julia> rm(joinpath(Pkg.dir(\"WORLD\"),  \"deps\", \"deps.jl\"))
-         julia> Pkg.build(\"WORLD\")
+         julia>  Pkg.build(\"WORLD\")
 
-         This should install the proper version of WORLD.
+         If not, simpily re-building WORLD.jl with the above command. This
+         should install the proper version of WORLD.
          """)
 end
 
