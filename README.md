@@ -6,13 +6,13 @@
 [![WORLD](http://pkg.julialang.org/badges/WORLD_release.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=release)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
-WORLD.jl is a Julia wrapper for WORLD - a high-quality speech analysis, manipulation and synthesis system. WORLD provides a way to decompose a speech signal into
+WORLD.jl is a Julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/world/english/index.html) - a high-quality speech analysis, manipulation and synthesis system. WORLD provides a way to decompose a speech signal into
 
 - Fundamental frequency (F0)
 - spectral envelope
 - aperiodicity
 
-and re-synthesize a speech signal from these paramters. See [here](http://ml.cs.yamanashi.ac.jp/world/english/index.html) for the original WORLD.
+and re-synthesize a speech signal from these paramters. Please see the project page for more details on the WORLD.
 
 ## Supported Platforms
 
@@ -88,7 +88,7 @@ y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
 
 ### Compact speech parameterization
 
-Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1023) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
+Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1025) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
 
 #### spectrum envelope to mel-cepstrum
 
@@ -96,7 +96,7 @@ Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional 
 mc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41
 ```
 
-`order` is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter which often used in mel-cepstrum definition.
+where `order` is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter.
 
 ![](examples/melcepstrum.png)
 
