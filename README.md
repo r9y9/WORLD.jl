@@ -3,8 +3,10 @@
 [![Build Status](https://travis-ci.org/r9y9/WORLD.jl.svg?branch=master)](https://travis-ci.org/r9y9/WORLD.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/j6xrcx8s6wyahacs/branch/master?svg=true)](https://ci.appveyor.com/project/r9y9/world-jl/branch/master)
 [![Coverage Status](https://coveralls.io/repos/r9y9/WORLD.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/WORLD.jl?branch=master)
-[![WORLD](http://pkg.julialang.org/badges/WORLD_release.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=release)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
+
+[![WORLD](http://pkg.julialang.org/badges/WORLD_release.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=release)
+[![WORLD](http://pkg.julialang.org/badges/WORLD_nightly.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=nightly)
 
 WORLD.jl is a Julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/world/english/index.html) - a high-quality speech analysis, manipulation and synthesis system. WORLD provides a way to decompose a speech signal into
 
