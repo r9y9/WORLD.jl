@@ -12,9 +12,9 @@ function test_dio(x, fs::Int=44100, period::Float64=5.0)
     println("test_dio: fs=$(fs), period=$(period)")
     opt = DioOption(71.0, 800.0, 2, period, 1)
     f0, timeaxis = dio(x, fs, opt)
-    @test !any(isnan(f0))
+    @test all(isfinite(f0))
     @test all(f0 .>= 0.0)
-    @test !any(isnan(timeaxis))
+    @test all(isfinite(timeaxis))
 end
 
 function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
@@ -22,7 +22,7 @@ function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
     opt = DioOption(71.0, 800.0, 2, period, 1)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
-    @test !any(isnan(f0))
+    @test all(isfinite(f0))
     @test all(f0 .>= 0.0)
 end
 
@@ -32,7 +32,7 @@ function test_cheaptrick(x, fs::Int=44100, period::Float64=5.0)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
-    @test !any(isnan(spectrogram))
+    @test all(isfinite(spectrogram))
 end
 
 function test_d4c(x, fs::Int=44100, period::Float64=5.0)
@@ -41,7 +41,7 @@ function test_d4c(x, fs::Int=44100, period::Float64=5.0)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
     aperiodicity = d4c(x, fs, timeaxis, f0)
-    @test !any(isnan(aperiodicity))
+    @test all(isfinite(aperiodicity))
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
@@ -54,25 +54,25 @@ function test_synthesis(x::AbstractArray, fs::Int=44100,
 
     # Fundamental frequency (f0) estimation by DIO
     f0, timeaxis = dio(x, fs, opt)
-    @test !any(isnan(f0))
-    @test !any(isnan(timeaxis))
+    @test all(isfinite(f0))
+    @test all(isfinite(timeaxis))
 
     # F0 re-estimation by StoneMask
     f0 = stonemask(x, fs, timeaxis, f0)
-    @test !any(isnan(f0))
+    @test all(isfinite(f0))
 
     # Spectral envelope estimation
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
-    @test !any(isnan(spectrogram))
+    @test all(isfinite(spectrogram))
 
     # Aperiodicity ratio estimation by D4C
     aperiodicity = d4c(x, fs, timeaxis, f0)
-    @test !any(isnan(aperiodicity))
+    @test all(isfinite(aperiodicity))
 
     # Sysnthesis from f0, spectral envelope and aperiodicity ratio.
     y_length = convert(Int, (length(f0)-1)*period/1000 * fs + 1)
     y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
-    @test !any(isnan(y))
+    @test all(isfinite(y))
 
     minlen = min(length(x), length(y))
     errorrate = mean(abs(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
@@ -194,7 +194,7 @@ let
 
     # spectral stretching
     interpolated_logspec = interp1(freqaxis_src, logspec, freqaxis_dst)
-    @test !any(isnan(interpolated_logspec))
+    @test all(isfinite(interpolated_logspec))
 
     interpolated_spec = exp(interpolated_logspec)
 
