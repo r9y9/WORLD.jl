@@ -2,22 +2,21 @@
 
 # TODO(ryuichi) import from MelGeneralizedCepstrums or SPTK
 # copied from r9y9/MelGeneralizedCepstrums.jl
-function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
-                                  α::FloatingPoint;
-                                  prev::Vector{T}=Array(T,length(wc)))
-    fill!(wc, zero(T))
-    desired_order = length(wc) - 1
+function freqt!(wc::AbstractVector, c::AbstractVector, α;
+                prev=Array(eltype(wc), length(wc)))
+    fill!(wc, zero(eltype(wc)))
+    dst_order = length(wc) - 1
 
     m1 = length(c)-1
-    for i=-m1:0
+    for i in -m1:0
         copy!(prev, wc)
-        if desired_order >= 0
+        if dst_order >= 0
             @inbounds wc[1] = c[-i+1] + α*prev[1]
         end
-        if desired_order >= 1
+        if dst_order >= 1
             wc[2] = (1.0-α*α)*prev[1] + α*prev[2]
         end
-        for m=3:desired_order+1
+        for m=3:dst_order+1
             @inbounds wc[m] = prev[m-1] + α*(prev[m] - wc[m-1])
         end
     end
@@ -25,17 +24,16 @@ function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
     wc
 end
 
-function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
-                                 α::FloatingPoint)
-    wc = Array(T, order+1)
+function freqt(c::AbstractVector, order=25, α=0.35)
+    wc = Array(eltype(c), order+1)
     freqt!(wc, c, α)
 end
 
 # sp2mc converts power spectrum envelope to mel-cepstrum
 # |X(ω)|² -> cₐ(m)
 function sp2mc(powerspec::AbstractVector,
-               order::Int,
-               α::FloatingPoint; # all-pass constant
+               order,
+               α; # all-pass constant
                fftlen::Int=(length(powerspec)-1)*2
     )
     # |X(ω)|² -> log(|X(ω)²|)
@@ -54,7 +52,7 @@ end
 # cₐ(m) -> |X(ω)|²
 # equivalent: exp(2real(MelGeneralizedCepstrums.mgc2sp(mc, α, 0.0, fftlen)))
 # Note that `MelGeneralizedCepstrums.mgc2sp` returns log magnitude spectrum.
-function mc2sp{T}(mc::AbstractVector{T}, α::Float64, fftlen::Int)
+function mc2sp{T}(mc::AbstractVector{T}, α, fftlen)
     # back to cepstrum from mel-cesptrum
     # cₐ(m) -> c(m)
     c = freqt(mc, fftlen>>1, -α)
