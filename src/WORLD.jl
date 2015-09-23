@@ -28,7 +28,9 @@ export
     sp2mc,  # spectrum envelope to mel-cesptrum
     mc2sp   # mel-cepstrum to spectrum envelope
 
-# Dependency
+# Binary dependency loading
+# NOTE: I think this is ok to run in precompile time, since Julia is
+# automatically recompiling the cache file if any change to deps.jl is detected.
 deps = joinpath(Pkg.dir("WORLD"), "deps", "deps.jl")
 if isfile(deps)
     include(deps)

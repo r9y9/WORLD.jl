@@ -1,6 +1,8 @@
 ### Runtime initialization ###
 
 # Check binary dependency compatibility
+# This should prevent segfaults when you are using WORLD on system paths (e.g.
+# /usr/local/lib/libworld.so) and accidentaly change the verion of WORLD.
 
 try
     # function GetWORLDVersion was added in v0.2.1-2
