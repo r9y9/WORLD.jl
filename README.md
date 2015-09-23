@@ -15,6 +15,8 @@ WORLD.jl is a Julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/world/engli
 
 and re-synthesize a speech signal from these paramters. Please see the project page for more details on the WORLD.
 
+**NOTE**: WORLD.jl is based on a modified version of WORLD ([r9y9/WORLD](https://github.com/r9y9/WORLD)).
+
 ## Supported Platforms
 
 - Linux
