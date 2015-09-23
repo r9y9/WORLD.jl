@@ -5,7 +5,7 @@ using Compat
 
 world = library_dependency("libworld", aliases=["libworld", "world-0"])
 
-const version = "0.2.1-3"
+const version = "0.2.1-4"
 
 github_root = "https://github.com/r9y9/WORLD"
 arch = WORD_SIZE == 64 ? "x86_64" : "i686"

@@ -7,6 +7,8 @@ module WORLD
 export
     # Types
     DioOption,
+    CheapTrickOption,
+    D4COption,
 
     # WORLD functions
     dio,
@@ -47,17 +49,26 @@ catch e
     end
 end
 
-if version < v"0.2.0"
-    warn("""WORLD version incompatibility
+# v0.2.1-4 breaks API of CheapTrick and D4C, and it's hard to support both old
+# and new WORLD library, so throws an error when older version of WORLD is
+# detected.
+if version < v"0.2.1-4"
+    error("""Binary dependency incompatibility
 
-         WORLD version 0.2.0 or later is recommended but $(version) is detected.
-         If you have WORLD installed on system path, please get the latest
-         stable WORLD and install it, and then re-build WORLD.jl with:
+          WORLD version 0.2.1-4 or later must be required ($(version) is detected).
+          If you have WORLD installed on your system paths, please get the latest
+          stable WORLD and install it, and then re-build WORLD.jl with:
 
-         julia>  Pkg.build(\"WORLD\")
+          julia>  Pkg.build(\"WORLD\")
 
-         If not, simpily re-building WORLD.jl with the above command. This
-         should install the proper version of WORLD.
+          If not, simpily re-building WORLD.jl with the above command. This
+          should install the proper version of WORLD.
+
+          If you want to use WORLD.jl with older WORLD, please downgrade WORLD.jl
+          for your need. E.g.
+
+          julia> cd(Pkg.dir(\"WORLD\"))
+          shell> git checkout v0.1.3 # that supprts v0.2.0 to v0.2.1-3.
          """)
 end
 
