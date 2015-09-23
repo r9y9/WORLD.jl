@@ -1,48 +1,35 @@
-@assert isdefined(:libworld)
+# DioOption represents a set of options that is used in DIO,
+# a fundamental frequency analysis.
+immutable DioOption
+    f0floor::Cdouble
+    f0ceil::Cdouble
+    channels_in_octave::Cdouble
+    period::Cdouble # ms
+    speed::Cint
+    allowed_range::Cdouble # added in v0.2.1-2 (WORLD 0.2.0_2)
 
-if version >= v"0.2.1-2"
-    # DioOption represents a set of options that is used in DIO,
-    # a fundamental frequency analysis.
-    immutable DioOption
-        f0floor::Cdouble
-        f0ceil::Cdouble
-        channels_in_octave::Cdouble
-        period::Cdouble # ms
-        speed::Cint
-        allowed_range::Cdouble # added in v0.2.1-2 (WORLD 0.2.0_2)
-
-        function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
-                           allowed_range = 0.1)
-            f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
-            f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
-            if channels_in_octave < 0
-                throw(ArgumentError("channels_in_octave must be positive"))
-            end
-            period <= 0 && throw(ArgumentError("period must be positive"))
-            (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
-            allowed_range >= 0 || throw(ArgumentError("allowed_range >= 0 is supported"))
-            new(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
+    function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
+                       allowed_range = 0.1)
+        f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
+        f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
+        if channels_in_octave < 0
+            throw(ArgumentError("channels_in_octave must be positive"))
         end
+        period <= 0 && throw(ArgumentError("period must be positive"))
+        (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
+        allowed_range >= 0 || throw(ArgumentError("allowed_range >= 0 is supported"))
+        new(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
     end
-else
-    immutable DioOption
-        f0floor::Cdouble
-        f0ceil::Cdouble
-        channels_in_octave::Cdouble
-        period::Cdouble # ms
-        speed::Cint
+end
 
-        function DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
-            f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
-            f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
-            if channels_in_octave < 0
-                throw(ArgumentError("channels_in_octave must be positive"))
-            end
-            period <= 0 && throw(ArgumentError("period must be positive"))
-            (1 <= speed <= 12) || throw(ArgumentError("1 ≤ speed ≤ 12 is supprted"))
-            new(f0floor, f0ceil, channels_in_octave, period, speed)
-        end
-    end
+immutable CheapTrickOption
+    q1::Cdouble
+    CheapTrickOption(q1=-0.09) = new(q1)
+end
+
+immutable D4COption
+    dummy::Cdouble
+    D4COption(dummy=0.0) = new(dummy)
 end
 
 # Note that the default options assume that the sampling frequency of a input
@@ -78,6 +65,10 @@ function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     f0, timeaxis
 end
 
+function dio(x::StridedVector{Cdouble}, fs::Real; opt::DioOption=DioOption())
+    dio(x, fs, opt)
+end
+
 function stonemask(x::StridedVector{Cdouble}, fs::Integer,
                    timeaxis::StridedVector{Cdouble},
                    f0::StridedVector{Cdouble})
@@ -103,7 +94,9 @@ end
 
 function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
                     timeaxis::StridedVector{Cdouble},
-                    f0::StridedVector{Cdouble})
+                    f0::StridedVector{Cdouble};
+                    opt::CheapTrickOption=CheapTrickOption()
+    )
     freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
     spectrogram = Array(Cdouble, freqbins, length(f0))
 
@@ -113,8 +106,8 @@ function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
 
     ccall((:CheapTrick, libworld), Void,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
-           Ptr{Ptr{Cdouble}}),
-          x, length(x), fs, timeaxis, f0, length(f0), cspectrogram)
+           Ptr{CheapTrickOption}, Ptr{Ptr{Cdouble}}),
+          x, length(x), fs, timeaxis, f0, length(f0), &opt, cspectrogram)
 
     # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
     for i=1:length(f0), j=1:freqbins
@@ -126,7 +119,8 @@ end
 
 function d4c(x::StridedVector{Cdouble}, fs::Integer,
              timeaxis::StridedVector{Cdouble},
-             f0::StridedVector{Cdouble})
+             f0::StridedVector{Cdouble};
+             opt::D4COption=D4COption())
     fftsize = get_fftsize_for_cheaptrick(fs)
     freqbins = fftsize>>1 + 1
     aperiodicity = zeros(Cdouble, freqbins, length(f0))
@@ -137,8 +131,9 @@ function d4c(x::StridedVector{Cdouble}, fs::Integer,
 
     ccall((:D4C, libworld), Void,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint, Cint,
-           Ptr{Ptr{Cdouble}}),
-          x, length(x), fs, timeaxis, f0, length(f0), fftsize, caperiodicity)
+           Ptr{D4COption}, Ptr{Ptr{Cdouble}}),
+          x, length(x), fs, timeaxis, f0, length(f0), fftsize, &opt,
+          caperiodicity)
 
     # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
     for i=1:length(f0), j=1:freqbins
