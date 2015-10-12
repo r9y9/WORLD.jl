@@ -42,11 +42,7 @@ function DioOption(;
                    speed::Integer=1,
                    allowed_range::Float64=0.1
                    )
-    if version >= v"0.2.1-2"
-        DioOption(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
-    else
-        DioOption(f0floor, f0ceil, channels_in_octave, period, speed)
-    end
+    DioOption(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
 end
 
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)
