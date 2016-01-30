@@ -61,10 +61,6 @@ function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     f0, timeaxis
 end
 
-function dio(x::StridedVector{Cdouble}, fs::Real; opt::DioOption=DioOption())
-    dio(x, fs, opt)
-end
-
 function stonemask(x::StridedVector{Cdouble}, fs::Integer,
                    timeaxis::StridedVector{Cdouble},
                    f0::StridedVector{Cdouble})
