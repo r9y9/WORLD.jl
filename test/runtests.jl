@@ -207,6 +207,9 @@ end
 # deprecated
 
 let
-    f0, timeaxis = dio(x, fs)
-    @test_throws Exception platinum(x, fs, timeaxis, f0)
+    x = rand(1)
+    spectrogram = rand(1,1)
+    f0 = rand(1)
+    timeaxis = rand(1)
+    @test_throws ErrorException WORLD.platinum(x, fs, timeaxis, f0, spectrogram)
 end
