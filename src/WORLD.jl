@@ -2,6 +2,8 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module WORLD
 
+using Compat
+
 # A light-weight julia wrapper for WORLD.
 
 export
@@ -42,7 +44,7 @@ end
 # /usr/local/lib/libworld.so) and accidentaly change the verion of WORLD.
 try
     # function GetWORLDVersion was added in v0.2.1-2
-    versionstr = bytestring(ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ()))
+    versionstr = unsafe_string(ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ()))
     global const version = convert(VersionNumber, versionstr)
 catch e
     try
