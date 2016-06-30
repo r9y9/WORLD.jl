@@ -3,6 +3,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module WORLD
 
 using Compat
+import Compat: view
 
 # A light-weight julia wrapper for WORLD.
 
