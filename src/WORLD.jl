@@ -45,14 +45,15 @@ end
 # /usr/local/lib/libworld.so) and accidentaly change the verion of WORLD.
 try
     # function GetWORLDVersion was added in v0.2.1-2
-    versionstr = unsafe_string(ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ()))
+    versionstr = unsafe_string(convert(Ptr{UInt8},
+        ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ())))
     global const version = convert(VersionNumber, versionstr)
 catch e
     try
         ccall((:GetFFTSizeForStar, libworld), Cint, (Cint,), 48000)
-        version = v"0.1.4"
+        global const version = v"0.1.4"
     catch e
-        version = v"0.2.0"
+        global const version = v"0.2.0"
     end
 end
 
