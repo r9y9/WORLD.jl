@@ -1,4 +1,5 @@
 using WORLD
+using Compat
 using Base.Test
 
 @show WORLD.version
@@ -6,7 +7,7 @@ using Base.Test
 # Check consistency of the results between WORLD and WORLD.jl.
 # Due to the results of the WORLD were dumped (see ./data) on linux,
 # we test consistency only on linux.
-@linux_only include("consistency.jl")
+@static is_linux() ? include("consistency.jl") : nothing
 
 function test_dio(x, fs::Int=44100, period::Float64=5.0)
     println("test_dio: fs=$(fs), period=$(period)")

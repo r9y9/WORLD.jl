@@ -75,7 +75,7 @@ end
 # Array{T,2} -> Array{Ptr{T}}
 function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
     for i=1:size(src, 2)
-        @inbounds dst[i] = pointer(sub(src, 1:size(src, 1), i), 1)
+        @inbounds dst[i] = pointer(view(src, 1:size(src, 1), i), 1)
     end
 end
 
