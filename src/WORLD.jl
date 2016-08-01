@@ -33,7 +33,7 @@ export
 
 
 ### Binary dependency loading ###
-deps = joinpath(Pkg.dir("WORLD"), "deps", "deps.jl")
+deps = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
 if isfile(deps)
     include(deps)
 else
