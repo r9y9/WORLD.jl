@@ -42,93 +42,10 @@ julia> Pkg.build("WORLD")
 
 All dependencies are resolved with `Pkg.clone` and `Pkg.build`.
 
-## Usage
+## Documentation
 
-In the following examples, suppose `x::Vector{Float64}` is a input monoral speech signal like
+- [**STABLE**][docs-stable-url] &mdash; **most recently tagged version of the documentation.**
+- [**LATEST**][docs-latest-url] &mdash; *in-development version of the documentation.*
 
-![](examples/x.png)
-
-### F0 estimation and refinement
-
-#### DIO
-
-```julia
-opt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0, period=period, speed=1)
-f0, timeaxis = dio(x, fs, opt)
-```
-
-![](examples/f0_by_dio.png)
-
-#### StoneMask
-
-```julia
-f0 = stonemask(x, fs, timeaxis, f0)
-```
-
-![](examples/f0_refinement.png)
-
-### Spectral envelope estimation by CheapTrick
-
-```julia
-spectrogram = cheaptrick(x, fs, timeaxis, f0)
-```
-
-![](examples/envelope_by_cheaptrick.png)
-
-### Aperiodicity ratio estimation by D4C
-
-```julia
-aperiodicity = d4c(x, fs, timeaxis, f0)
-```
-
-![](examples/aperiodicity_by_d4c.png)
-
-### Synthesis
-
-```julia
-y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
-```
-
-![](examples/synthesis.png)
-
-### Compact speech parameterization
-
-Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1025) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.
-
-#### spectrum envelope to mel-cepstrum
-
-```julia
-mc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41
-```
-
-where `order` is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter.
-
-![](examples/melcepstrum.png)
-
-#### mel-cepstrum to spectrum envelope
-
-```julia
-approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
-```
-
-![](examples/envelope_reconstructed_from_melcepstrum.png)
-
-#### aperiodicity spectrum to aperiodicity mel-cesptrum
-
-```julia
-ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
-```
-
-![](examples/aperiodicity_melcepstrum.png)
-
-**NOTE**: HTS v2.3 beta seems to parameterize aperiodicity spectrum in this way (but does this really make sense?).
-
-#### aperiodicity mel-cepstrum to aperiodicity spectrum
-
-```julia
-approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
-```
-
-![](examples/approximate_aperiodicity.png)
-
-For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/examples/Demonstration%20of%20WORLD.jl.ipynb).
+[docs-latest-url]: https://r9y9.github.io/WORLD.jl/latest
+[docs-stable-url]: https://r9y9.github.io/WORLD.jl/stable

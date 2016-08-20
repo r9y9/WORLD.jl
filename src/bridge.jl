@@ -1,12 +1,20 @@
-# DioOption represents a set of options that is used in DIO,
-# a fundamental frequency analysis.
+"""
+DioOption represents a set of options that is used in DIO, a fundamental
+frequency analysis.
+
+**Fields**
+
+$(FIELDS)
+"""
 immutable DioOption
     f0floor::Cdouble
     f0ceil::Cdouble
     channels_in_octave::Cdouble
-    period::Cdouble # ms
+    "frame period in ms"
+    period::Cdouble
     speed::Cint
-    allowed_range::Cdouble # added in v0.2.1-2 (WORLD 0.2.0_2)
+    "added in v0.2.1-2 (WORLD 0.2.0_2)"
+    allowed_range::Cdouble
 
     function DioOption(f0floor, f0ceil, channels_in_octave, period, speed,
                        allowed_range = 0.1)
@@ -22,11 +30,25 @@ immutable DioOption
     end
 end
 
+"""
+CheapTrick options
+
+**Fields**
+
+$(FIELDS)
+"""
 immutable CheapTrickOption
     q1::Cdouble
     CheapTrickOption(q1=-0.09) = new(q1)
 end
 
+"""
+D4C options (nothing for now, but for future changes)
+
+**Fields**
+
+$(FIELDS)
+"""
 immutable D4COption
     dummy::Cdouble
     D4COption(dummy=0.0) = new(dummy)
@@ -50,6 +72,23 @@ function get_samples_for_dio(fs::Real, len::Integer, period::Real)
           (Cint, Cint, Cdouble), fs, len, period)
 end
 
+"""
+$(SIGNATURES)
+
+Dio estimates F0 trajectory given a monoral input signal.
+
+**Paremters**
+
+- `x`  : Input signal
+- `fs` : Sampling frequency
+- `opt` : DioOption
+
+**Returns**
+
+- `time_axis`  : Temporal positions.
+- `f0`         : F0 contour.
+
+"""
 function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array(Cdouble, expectedlen)
@@ -61,6 +100,22 @@ function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     f0, timeaxis
 end
 
+"""
+$(SIGNATURES)
+
+StoneMask refines the estimated F0 by Dio,
+
+**Parameters**
+
+- `x` : Input signal
+- `fs` : Sampling frequency
+- `time_axis` : Temporal information
+- `f0` : f0 contour
+
+**Returns**
+
+- `refined_f0` : Refined F0
+"""
 function stonemask(x::StridedVector{Cdouble}, fs::Integer,
                    timeaxis::StridedVector{Cdouble},
                    f0::StridedVector{Cdouble})
@@ -79,11 +134,43 @@ function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
     end
 end
 
+"""
+$(SIGNATURES)
+
+GetFFTSizeForCheapTrick calculates the FFT size based on the sampling
+frequency and the lower limit of f0 (It is defined in world.h).
+
+**Parameters**
+
+- `fs`: Sampling frequency
+
+**Returns**
+
+- `fftsize` : FFT size
+"""
 function get_fftsize_for_cheaptrick(fs::Integer)
     fftsize = ccall((:GetFFTSizeForCheapTrick, libworld), Cint, (Cint,), fs)
     convert(Int, fftsize)
 end
 
+"""
+$(SIGNATURES)
+
+CheapTrick calculates the spectrogram that consists of spectral envelopes
+estimated by CheapTrick.
+
+**Parameters**
+
+- `x` : Input signal
+- `fs` : Sampling frequency
+- `time_axis` : Time axis
+- `f0` : F0 contour
+- `opt` : CheapTrick option
+
+**Returns**
+
+- `spectrogram`  : Spectrogram estimated by CheapTrick.
+"""
 function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
                     timeaxis::StridedVector{Cdouble},
                     f0::StridedVector{Cdouble};
@@ -109,6 +196,22 @@ function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
     spectrogram
 end
 
+"""
+$(SIGNATURES)
+
+D4C calculates the aperiodicity estimated by D4C.
+
+**Parameters**
+
+- `x` : Input signal
+- `fs` : Sampling frequency
+- `time_axis` : Time axis
+- `f0` : F0 contour
+
+**Returns**
+
+- `aperiodicity` : Aperiodicity estimated by D4C.
+"""
 function d4c(x::StridedVector{Cdouble}, fs::Integer,
              timeaxis::StridedVector{Cdouble},
              f0::StridedVector{Cdouble};
@@ -135,6 +238,25 @@ function d4c(x::StridedVector{Cdouble}, fs::Integer,
     aperiodicity
 end
 
+"""
+$(SIGNATURES)
+
+Synthesis synthesize the voice based on f0, spectrogram and
+aperiodicity (not excitation signal.
+
+**Parameters**
+
+- `f0` : f0 contour
+- `spectrogram` : Spectrogram estimated by CheapTrick
+- `aperiodicity` : Aperiodicity spectrogram based on D4C
+- `period` :  Temporal period used for the analysis
+- `fs` : Sampling frequency
+- `len` : Length of the output signal
+
+**Returns**
+
+- `y` : Calculated speech
+"""
 function synthesis(f0::StridedVector{Cdouble},
                    spectrogram::StridedMatrix{Cdouble},
                    aperiodicity::StridedMatrix{Cdouble},
@@ -160,6 +282,18 @@ end
 
 # matlabfunctions
 
+"""
+$(SIGNATURES)
+
+inplace version of interp1
+
+**Parameters**
+
+- `x` : Input vector (Time axis)
+- `y` : Values at x[n]
+- `xi`: Required vector
+- `yi` : Interpolated vector
+"""
 function interp1!(x::StridedVector{Cdouble},
                   y::StridedVector{Cdouble},
                   xi::StridedVector{Cdouble},
@@ -172,6 +306,23 @@ function interp1!(x::StridedVector{Cdouble},
     yi
 end
 
+"""
+$(SIGNATURES)
+
+interp1 interpolates to find yi, the values of the underlying function Y
+at the points in the vector or array xi. x must be a vector.
+http://www.mathworks.co.jp/help/techdoc/ref/interp1.html
+
+**Parameters**
+
+- `x` : Input vector (Time axis)
+- `y` : Values at x[n]
+- `xi`: Required vector
+
+**Returns**
+
+- `yi` : Interpolated vector
+"""
 function interp1(x::StridedVector{Cdouble},
                  y::StridedVector{Cdouble},
                  xi::StridedVector{Cdouble})

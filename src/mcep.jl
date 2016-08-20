@@ -29,8 +29,15 @@ function freqt(c::AbstractVector, order=25, α=0.35)
     freqt!(wc, c, α)
 end
 
-# sp2mc converts power spectrum envelope to mel-cepstrum
-# |X(ω)|² -> cₐ(m)
+"""
+$(SIGNATURES)
+
+sp2mc converts power spectrum envelope to mel-cepstrum
+
+``
+|X(\\omega)|^{2} -> c\_{\\alpha}(m)
+``
+"""
 function sp2mc(powerspec::AbstractVector,
                order,
                α; # all-pass constant
@@ -48,10 +55,18 @@ function sp2mc(powerspec::AbstractVector,
     freqt(c, order, α)
 end
 
-# mc2sp converts mel-cepstrum to power spectrum envelope.
-# cₐ(m) -> |X(ω)|²
-# equivalent: exp(2real(MelGeneralizedCepstrums.mgc2sp(mc, α, 0.0, fftlen)))
-# Note that `MelGeneralizedCepstrums.mgc2sp` returns log magnitude spectrum.
+"""
+$(SIGNATURES)
+
+mc2sp converts mel-cepstrum to power spectrum envelope.
+
+``
+c\_{\\alpha}(m) -> |X(\\omega)|^{2}
+``
+
+equivalent: `exp(2real(MelGeneralizedCepstrums.mgc2sp(mc, α, 0.0, fftlen)))`
+Note that `MelGeneralizedCepstrums.mgc2sp` returns log magnitude spectrum.
+"""
 function mc2sp{T}(mc::AbstractVector{T}, α, fftlen)
     # back to cepstrum from mel-cesptrum
     # cₐ(m) -> c(m)

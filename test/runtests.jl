@@ -203,14 +203,3 @@ let
     interp1!(freqaxis_src, logspec, freqaxis_dst, interpolated_logspec2)
     @test interpolated_logspec == interpolated_logspec2
 end
-
-
-# deprecated
-
-let
-    x = rand(1)
-    spectrogram = rand(1,1)
-    f0 = rand(1)
-    timeaxis = rand(1)
-    @test_throws ErrorException WORLD.platinum(x, fs, timeaxis, f0, spectrogram)
-end
