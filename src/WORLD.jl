@@ -1,8 +1,20 @@
 __precompile__()
 
 """
-A lightweight julia wrapper for WORLD - a high-quality speech analysis,
-modification and synthesis system
+A lightweitht julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/\
+world/english/index.html) - a high-quality speech analysis, manipulation and
+synthesis system. WORLD provides a way to decompose a speech signal into:
+
+- Fundamental frequency (F0)
+- spectral envelope
+- aperiodicity
+
+and re-synthesize a speech signal from these paramters. Please see the project
+page for more details on the WORLD.
+
+!!! note
+    WORLD.jl is based on a modified version of WORLD ([r9y9/WORLD](\
+    https://github.com/r9y9/WORLD)).
 
 [https://github.com/r9y9/WORLD.jl](https://github.com/r9y9/WORLD.jl)
 
