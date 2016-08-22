@@ -1,35 +1,137 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 
+"""
+A lightweitht julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/\
+world/english/index.html) - a high-quality speech analysis, manipulation and
+synthesis system. WORLD provides a way to decompose a speech signal into:
+
+- Fundamental frequency (F0)
+- spectral envelope
+- aperiodicity
+
+and re-synthesize a speech signal from these paramters. Please see the project
+page for more details on the WORLD.
+
+!!! note
+    WORLD.jl is based on a modified version of WORLD ([r9y9/WORLD](\
+    https://github.com/r9y9/WORLD)).
+
+[https://github.com/r9y9/WORLD.jl](https://github.com/r9y9/WORLD.jl)
+
+## Usage
+
+In the following examples, suppose `x::Vector{Float64}` is a input monoral
+speech signal like:
+
+![](assets/x.png)
+
+### F0 estimation and refinement
+
+#### DIO
+
+```@example
+opt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0,
+        period=period, speed=1)
+f0, timeaxis = dio(x, fs, opt)
+```
+
+![](assets/f0_by_dio.png)
+
+#### StoneMask
+
+```@example
+f0 = stonemask(x, fs, timeaxis, f0)
+```
+
+![](assets/f0_refinement.png)
+
+### Spectral envelope estimation by CheapTrick
+
+```@example
+spectrogram = cheaptrick(x, fs, timeaxis, f0)
+```
+
+![](assets/envelope_by_cheaptrick.png)
+
+### Aperiodicity ratio estimation by D4C
+
+```@example
+aperiodicity = d4c(x, fs, timeaxis, f0)
+```
+
+![](assets/aperiodicity_by_d4c.png)
+
+### Synthesis
+
+```@example
+y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
+```
+
+![](assets/synthesis.png)
+
+### Compact speech parameterization
+
+Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional
+(offen more than 513 or 1025) so one might want to get more compact
+representation. To do so, mel-cepstrum could be a good choice. As far as I know,
+this would be useful in statistical speech synthesis and statistical voice
+conversion.
+
+#### spectrum envelope to mel-cepstrum
+
+```@example
+mc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41
+```
+
+where `order` is the order of mel-cepstrum (except for 0th) and α is a frequency
+warping parameter.
+
+![](assets/melcepstrum.png)
+
+#### mel-cepstrum to spectrum envelope
+
+```@example
+approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
+```
+
+![](assets/envelope_reconstructed_from_melcepstrum.png)
+
+#### aperiodicity spectrum to aperiodicity mel-cesptrum
+
+```@example
+ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
+```
+
+![](assets/aperiodicity_melcepstrum.png)
+
+!!! note
+    HTS v2.3 beta seems to parameterize aperiodicity spectrum in this way
+    (but does this really make sense?).
+
+#### aperiodicity mel-cepstrum to aperiodicity spectrum
+
+```@example
+approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
+```
+
+![](assets/approximate_aperiodicity.png)
+
+For the complete code of visualizations shown above, please check
+[the IJulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/\
+    assets/Demonstration%20of%20WORLD.jl.ipynb).
+
+## Exports
+
+$(EXPORTS)
+"""
 module WORLD
 
+using DocStringExtensions
 using Compat
 import Compat: view
 
-# A light-weight julia wrapper for WORLD.
-
-export
-    # Types
-    DioOption,
-    CheapTrickOption,
-    D4COption,
-
-    # WORLD functions
-    dio,
-    stonemask,
-    cheaptrick,
-    d4c,
-    synthesis,
-
-    # utils
-    get_fftsize_for_cheaptrick,
-
-    # matlab functions
-    interp1!,
-    interp1,
-
-    # conversion
-    sp2mc,  # spectrum envelope to mel-cesptrum
-    mc2sp   # mel-cepstrum to spectrum envelope
+export DioOption, CheapTrickOption, D4COption, dio, stonemask, cheaptrick,
+    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp
 
 
 ### Binary dependency loading ###
