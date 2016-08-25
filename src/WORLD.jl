@@ -1,8 +1,9 @@
 __precompile__()
 
 """
-A lightweitht julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/\
-world/english/index.html) - a high-quality speech analysis, manipulation and
+A lightweitht julia wrapper for [WORLD](\
+    http://ml.cs.yamanashi.ac.jp/world/english/index.html)
+- a high-quality speech analysis, manipulation and
 synthesis system. WORLD provides a way to decompose a speech signal into:
 
 - Fundamental frequency (F0)
@@ -117,8 +118,8 @@ approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
 ![](assets/approximate_aperiodicity.png)
 
 For the complete code of visualizations shown above, please check
-[the IJulia notebook](http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/\
-    assets/Demonstration%20of%20WORLD.jl.ipynb).
+[the IJulia notebook](\
+    http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/docs/src/assets/Demonstration%20of%20WORLD.jl.ipynb).
 
 ## Exports
 
