@@ -30,7 +30,7 @@ speech signal like:
 
 #### DIO
 
-```@example
+```julia
 opt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0,
         period=period, speed=1)
 f0, timeaxis = dio(x, fs, opt)
@@ -40,7 +40,7 @@ f0, timeaxis = dio(x, fs, opt)
 
 #### StoneMask
 
-```@example
+```julia
 f0 = stonemask(x, fs, timeaxis, f0)
 ```
 
@@ -48,7 +48,7 @@ f0 = stonemask(x, fs, timeaxis, f0)
 
 ### Spectral envelope estimation by CheapTrick
 
-```@example
+```julia
 spectrogram = cheaptrick(x, fs, timeaxis, f0)
 ```
 
@@ -56,7 +56,7 @@ spectrogram = cheaptrick(x, fs, timeaxis, f0)
 
 ### Aperiodicity ratio estimation by D4C
 
-```@example
+```julia
 aperiodicity = d4c(x, fs, timeaxis, f0)
 ```
 
@@ -64,7 +64,7 @@ aperiodicity = d4c(x, fs, timeaxis, f0)
 
 ### Synthesis
 
-```@example
+```julia
 y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
 ```
 
@@ -80,7 +80,7 @@ conversion.
 
 #### spectrum envelope to mel-cepstrum
 
-```@example
+```julia
 mc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41
 ```
 
@@ -91,7 +91,7 @@ warping parameter.
 
 #### mel-cepstrum to spectrum envelope
 
-```@example
+```julia
 approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 ```
 
@@ -99,7 +99,7 @@ approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 
 #### aperiodicity spectrum to aperiodicity mel-cesptrum
 
-```@example
+```julia
 ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
 ```
 
@@ -111,7 +111,7 @@ ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
 
 #### aperiodicity mel-cepstrum to aperiodicity spectrum
 
-```@example
+```julia
 approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
 ```
 
