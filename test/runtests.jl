@@ -187,7 +187,11 @@ let
     f0, timeaxis = dio(x, fs, opt)
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
 
-    logspec = @compat log.(spectrogram[:,100])
+    logspec = @compat(log.(spectrogram[:,100]))
+    if isa(logspec, Array{Any,1})
+        warn("huaaa, remove this after dropping v0.4")
+        logspec = convert(Vector{Float64}, logspec)
+    end
     fftsize = get_fftsize_for_cheaptrick(fs)
 
     freqaxis_src = collect(1:(fftsize>>1+1)) / fftsize * fs
