@@ -19,7 +19,7 @@ opt = DioOption(71.0, 800.0, 2, period, 1, 0.1) # 0.1 = 0.02 * 5.0
 f0, timeaxis = dio(x, fs, opt)
 f0_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "f0.txt")))
 
-println("Maximum error in DIO is $(maximum(abs(f0-f0_org)))")
+println("Maximum error in DIO is $(maximum(@compat abs.(f0-f0_org)))")
 @test length(f0) == length(f0_org)
 @test_approx_eq_eps f0 f0_org 1.0e-10
 
@@ -27,7 +27,7 @@ println("Maximum error in DIO is $(maximum(abs(f0-f0_org)))")
 f0 = stonemask(x, fs, timeaxis, f0)
 f0_refined_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "f0_refined.txt")))
 
-println("Maximum error in StoneMask is $(maximum(abs(f0-f0_refined_org)))")
+println("Maximum error in StoneMask is $(maximum(@compat abs.(f0-f0_refined_org)))")
 @test length(f0) == length(f0_refined_org)
 @test_approx_eq_eps f0 f0_refined_org 1.0e-10
 
@@ -35,13 +35,13 @@ println("Maximum error in StoneMask is $(maximum(abs(f0-f0_refined_org)))")
 spectrogram = cheaptrick(x, fs, timeaxis, f0; opt=CheapTrickOption(-0.15))
 spectrogram_org = readdlm(joinpath(dirname(@__FILE__), "data", "spectrogram.txt"))'
 
-println("Maximum error in CheapTrick is $(maximum(abs(spectrogram - spectrogram_org)))")
+println("Maximum error in CheapTrick is $(maximum(@compat abs.(spectrogram - spectrogram_org)))")
 @test size(spectrogram) == size(spectrogram_org)
 @test_approx_eq_eps spectrogram spectrogram_org 1.0e-10
 
 aperiodicity = d4c(x, fs, timeaxis, f0; opt=D4COption())
 aperiodicity_org = readdlm(joinpath(dirname(@__FILE__), "data", "aperiodicity.txt"))'
-println("Maximum error in D4C is $(maximum(abs(aperiodicity-aperiodicity_org)))")
+println("Maximum error in D4C is $(maximum(@compat abs.(aperiodicity-aperiodicity_org)))")
 @test size(aperiodicity) == size(aperiodicity)
 @test_approx_eq_eps aperiodicity aperiodicity_org 1.0e-10
 
@@ -49,6 +49,6 @@ println("Maximum error in D4C is $(maximum(abs(aperiodicity-aperiodicity_org)))"
 y_length = convert(Int, ((length(f0)-1)*period/1000 * fs) + 1)
 y = synthesis(f0, spectrogram, aperiodicity, period, fs, y_length)
 y_org = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x_synthesized.txt")))
-println("Maximum error in Synthesis is $(maximum(abs(y-y_org)))")
+println("Maximum error in Synthesis is $(maximum(@compat abs.(y-y_org)))")
 @test length(y) == length(y_org)
 @test_approx_eq_eps y y_org 1.0e-10

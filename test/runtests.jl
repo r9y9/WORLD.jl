@@ -13,9 +13,9 @@ function test_dio(x, fs::Int=44100, period::Float64=5.0)
     println("test_dio: fs=$(fs), period=$(period)")
     opt = DioOption(71.0, 800.0, 2, period, 1)
     f0, timeaxis = dio(x, fs, opt)
-    @test all(isfinite(f0))
+    @test @compat all(isfinite.(f0))
     @test all(f0 .>= 0.0)
-    @test all(isfinite(timeaxis))
+    @test @compat all(isfinite.(timeaxis))
 end
 
 function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
@@ -23,7 +23,7 @@ function test_stonemask(x, fs::Int=44100, period::Float64=5.0)
     opt = DioOption(71.0, 800.0, 2, period, 1)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
-    @test all(isfinite(f0))
+    @test @compat all(isfinite.(f0))
     @test all(f0 .>= 0.0)
 end
 
@@ -33,7 +33,7 @@ function test_cheaptrick(x, fs::Int=44100, period::Float64=5.0)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
-    @test all(isfinite(spectrogram))
+    @test @compat all(isfinite.(spectrogram))
 end
 
 function test_d4c(x, fs::Int=44100, period::Float64=5.0)
@@ -42,7 +42,7 @@ function test_d4c(x, fs::Int=44100, period::Float64=5.0)
     f0, timeaxis = dio(x, fs, opt)
     f0 = stonemask(x, fs, timeaxis, f0)
     aperiodicity = d4c(x, fs, timeaxis, f0)
-    @test all(isfinite(aperiodicity))
+    @test @compat all(isfinite.(aperiodicity))
 end
 
 # speech -> {f0, envelope, aperiodicity} -> speech
@@ -55,28 +55,28 @@ function test_synthesis(x::AbstractArray, fs::Int=44100,
 
     # Fundamental frequency (f0) estimation by DIO
     f0, timeaxis = dio(x, fs, opt)
-    @test all(isfinite(f0))
-    @test all(isfinite(timeaxis))
+    @test @compat all(isfinite.(f0))
+    @test @compat all(isfinite.(timeaxis))
 
     # F0 re-estimation by StoneMask
     f0 = stonemask(x, fs, timeaxis, f0)
-    @test all(isfinite(f0))
+    @test @compat all(isfinite.(f0))
 
     # Spectral envelope estimation
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
-    @test all(isfinite(spectrogram))
+    @test @compat all(isfinite.(spectrogram))
 
     # Aperiodicity ratio estimation by D4C
     aperiodicity = d4c(x, fs, timeaxis, f0)
-    @test all(isfinite(aperiodicity))
+    @test @compat all(isfinite.(aperiodicity))
 
     # Sysnthesis from f0, spectral envelope and aperiodicity ratio.
     y_length = convert(Int, (length(f0)-1)*period/1000 * fs + 1)
     y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
-    @test all(isfinite(y))
+    @test @compat all(isfinite.(y))
 
     minlen = min(length(x), length(y))
-    errorrate = mean(abs(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
+    errorrate = @compat mean(abs.(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
 
     println("errorrate=$(errorrate)")
 
@@ -115,15 +115,15 @@ let
 
     # check normalized mean squared error
     approximate_spec = mc2sp(sp2mc(spec, 25, α), α, fftlen)
-    nmse25 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    nmse25 = @compat norm(log.(spec) - log.(approximate_spec)) / @compat norm(log.(spec))
     @test nmse25 <= 0.06
 
     approximate_spec = mc2sp(sp2mc(spec, 30, α), α, fftlen)
-    nmse30 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    nmse30 = @compat norm(log.(spec) - log.(approximate_spec)) / @compat norm(log.(spec))
     @test nmse30 <= 0.05
 
     approximate_spec = mc2sp(sp2mc(spec, 40, α), α, fftlen)
-    nmse40 = norm(log(spec) - log(approximate_spec))/norm(log(spec))
+    nmse40 = @compat norm(log.(spec) - log.(approximate_spec)) / @compat norm(log.(spec))
     @test nmse40 <= 0.03
 
     @test nmse25 > nmse30 > nmse40
@@ -187,7 +187,11 @@ let
     f0, timeaxis = dio(x, fs, opt)
     spectrogram = cheaptrick(x, fs, timeaxis, f0)
 
-    logspec = log(spectrogram[:,100])
+    logspec = @compat(log.(spectrogram[:,100]))
+    if isa(logspec, Array{Any,1})
+        warn("huaaa, remove this after dropping v0.4")
+        logspec = convert(Vector{Float64}, logspec)
+    end
     fftsize = get_fftsize_for_cheaptrick(fs)
 
     freqaxis_src = collect(1:(fftsize>>1+1)) / fftsize * fs
@@ -195,9 +199,9 @@ let
 
     # spectral stretching
     interpolated_logspec = interp1(freqaxis_src, logspec, freqaxis_dst)
-    @test all(isfinite(interpolated_logspec))
+    @test @compat all(isfinite.(interpolated_logspec))
 
-    interpolated_spec = exp(interpolated_logspec)
+    interpolated_spec = @compat exp.(interpolated_logspec)
 
     interpolated_logspec2 = similar(logspec)
     interp1!(freqaxis_src, logspec, freqaxis_dst, interpolated_logspec2)
