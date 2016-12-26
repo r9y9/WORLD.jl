@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.dio",
     "category": "Function",
-    "text": "dio(x, fs)\ndio(x, fs, opt)\n\n\nDio estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : DioOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
+    "text": "dio(x, fs, opt)\ndio(x, fs)\n\n\nDio estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : DioOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
 },
 
 {
