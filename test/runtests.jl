@@ -76,7 +76,7 @@ function test_synthesis(x::AbstractArray, fs::Int=44100,
     @test @compat all(isfinite.(y))
 
     minlen = min(length(x), length(y))
-    errorrate = @compat mean(abs.(y[1:minlen]-x[1:minlen])) / maxabs(x[1:minlen])
+    errorrate = @compat mean(abs.(y[1:minlen]-x[1:minlen])) / maximum(abs, x[1:minlen])
 
     println("errorrate=$(errorrate)")
 
