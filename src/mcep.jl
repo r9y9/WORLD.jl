@@ -3,7 +3,7 @@
 # TODO(ryuichi) import from MelGeneralizedCepstrums or SPTK
 # copied from r9y9/MelGeneralizedCepstrums.jl
 function freqt!(wc::AbstractVector, c::AbstractVector, α;
-                prev=Array(eltype(wc), length(wc)))
+                prev=Array{eltype(wc)}(length(wc)))
     fill!(wc, zero(eltype(wc)))
     dst_order = length(wc) - 1
 
@@ -25,7 +25,7 @@ function freqt!(wc::AbstractVector, c::AbstractVector, α;
 end
 
 function freqt(c::AbstractVector, order=25, α=0.35)
-    wc = Array(eltype(c), order+1)
+    wc = Array{eltype(c)}(order+1)
     freqt!(wc, c, α)
 end
 
@@ -91,7 +91,7 @@ for f in [:sp2mc,
     @eval begin
         function $f(x::AbstractMatrix, args...; kargs...)
             outbuf = $f(view(x, :, 1), args...; kargs...)
-            ret = Array(eltype(outbuf), length(outbuf), size(x, 2))
+            ret = Array{eltype(outbuf)}(length(outbuf), size(x, 2))
             copy!(ret, 1, outbuf, 1, length(outbuf))
             for i = 2:size(x, 2)
                 @inbounds ret[:, i] = $f(view(x, :, i), args...; kargs...)

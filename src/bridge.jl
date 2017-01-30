@@ -91,8 +91,8 @@ Dio estimates F0 trajectory given a monoral input signal.
 """
 function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
-    f0 = Array(Cdouble, expectedlen)
-    timeaxis = Array(Cdouble, expectedlen)
+    f0 = Array{Cdouble}(expectedlen)
+    timeaxis = Array{Cdouble}(expectedlen)
     # Note that value passinig of julia-type to C-struct doesn't work.
     ccall((:DioByOptPtr, libworld),  Void,
           (Ptr{Cdouble}, Cint, Cint, Ptr{DioOption}, Ptr{Cdouble}, Ptr{Cdouble}),
@@ -119,7 +119,7 @@ StoneMask refines the estimated F0 by Dio,
 function stonemask(x::StridedVector{Cdouble}, fs::Integer,
                    timeaxis::StridedVector{Cdouble},
                    f0::StridedVector{Cdouble})
-    refinedF0 = Array(Cdouble, length(f0))
+    refinedF0 = Array{Cdouble}(length(f0))
     ccall((:StoneMask, libworld),  Void,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
            Ptr{Cdouble}),
@@ -177,10 +177,10 @@ function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
                     opt::CheapTrickOption=CheapTrickOption()
     )
     freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
-    spectrogram = Array(Cdouble, freqbins, length(f0))
+    spectrogram = Array{Cdouble}(freqbins, length(f0))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array(Ptr{Cdouble}, size(spectrogram, 2))
+    cspectrogram = Array{Ptr{Cdouble}}(size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
     ccall((:CheapTrick, libworld), Void,
@@ -221,7 +221,7 @@ function d4c(x::StridedVector{Cdouble}, fs::Integer,
     aperiodicity = zeros(Cdouble, freqbins, length(f0))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    caperiodicity = Array(Ptr{Cdouble}, size(aperiodicity, 2))
+    caperiodicity = Array{Ptr{Cdouble}}(size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
     ccall((:D4C, libworld), Void,
@@ -264,13 +264,13 @@ function synthesis(f0::StridedVector{Cdouble},
     fftsize = get_fftsize_for_cheaptrick(fs)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array(Ptr{Cdouble}, size(spectrogram, 2))
+    cspectrogram = Array{Ptr{Cdouble}}(size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
-    caperiodicity = Array(Ptr{Cdouble}, size(aperiodicity, 2))
+    caperiodicity = Array{Ptr{Cdouble}}(size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    synthesized = Array(Cdouble, len)
+    synthesized = Array{Cdouble}(len)
     ccall((:Synthesis, libworld), Void,
           (Ptr{Cdouble}, Cint, Ptr{Ptr{Cdouble}}, Ptr{Ptr{Cdouble}},
            Cint, Cdouble, Cint, Cint, Ptr{Cdouble}),
