@@ -8,10 +8,10 @@ world = library_dependency("libworld", aliases=["libworld", "world-0"])
 const version = "0.2.1-4"
 
 github_root = "https://github.com/r9y9/WORLD"
-arch = WORD_SIZE == 64 ? "x86_64" : "i686"
+arch = Sys.WORD_SIZE == 64 ? "x86_64" : "i686"
 major = version[1]
 provides(Binaries,
-         URI("$(github_root)/releases/download/v$(version)/world-$(major)_mingw$(WORD_SIZE)_$(arch).zip"),
+         URI("$(github_root)/releases/download/v$(version)/world-$(major)_mingw$(Sys.WORD_SIZE)_$(arch).zip"),
          world, unpacked_dir = "usr/lib", os = :Windows)
 
 provides(Sources,
