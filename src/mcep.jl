@@ -44,7 +44,7 @@ function sp2mc(powerspec::AbstractVector,
                fftlen::Int=(length(powerspec)-1)*2
     )
     # |X(ω)|² -> log(|X(ω)²|)
-    logperiodogram = @compat log.(powerspec)
+    logperiodogram = log.(powerspec)
 
     # transform log-periodogram to real cepstrum
     # log(|X(ω)|²) -> c(m)
@@ -81,7 +81,7 @@ function mc2sp{T}(mc::AbstractVector{T}, α, fftlen)
 
     # back to power spectrum
     # c(m) -> log(|X(ω)|²) -> |X(ω)|²
-    @compat exp.(real(rfft(symc)))
+    exp.(real(rfft(symc)))
 end
 
 # extend vector to vector transformation for matrix input

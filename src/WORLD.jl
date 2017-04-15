@@ -128,8 +128,6 @@ $(EXPORTS)
 module WORLD
 
 using DocStringExtensions
-using Compat
-import Compat: view
 
 export DioOption, CheapTrickOption, D4COption, dio, stonemask, cheaptrick,
     d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp
