@@ -3,12 +3,13 @@ using Documenter, WORLD
 makedocs(
     modules = [WORLD],
     clean   = false,
-    format   = Documenter.Formats.HTML,
+    format   = :html,
     sitename = "WORLD.jl",
     pages = Any["Home" => "index.md"],
 )
 
 deploydocs(
+    julia = "0.5",
     target = "build",
     deps = nothing,
     make = nothing,
