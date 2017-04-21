@@ -1,8 +1,8 @@
 # WORLD.jl
 
-[![WORLD](http://pkg.julialang.org/badges/WORLD_0.3.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=0.3)
 [![WORLD](http://pkg.julialang.org/badges/WORLD_0.4.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=0.4)
 [![WORLD](http://pkg.julialang.org/badges/WORLD_0.5.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=0.5)
+[![WORLD](http://pkg.julialang.org/badges/WORLD_0.6.svg)](http://pkg.julialang.org/?pkg=WORLD&ver=0.6)
 
 [![][docs-stable-img]][docs-stable-url]
 [![][docs-latest-img]][docs-latest-url]
