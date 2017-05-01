@@ -6,7 +6,7 @@ frequency analysis.
 
 $(FIELDS)
 """
-immutable DioOption
+type DioOption
     f0floor::Cdouble
     f0ceil::Cdouble
     channels_in_octave::Cdouble
@@ -30,30 +30,6 @@ immutable DioOption
     end
 end
 
-"""
-CheapTrick options
-
-**Fields**
-
-$(FIELDS)
-"""
-immutable CheapTrickOption
-    q1::Cdouble
-    CheapTrickOption(q1=-0.09) = new(q1)
-end
-
-"""
-D4C options (nothing for now, but for future changes)
-
-**Fields**
-
-$(FIELDS)
-"""
-immutable D4COption
-    dummy::Cdouble
-    D4COption(dummy=0.0) = new(dummy)
-end
-
 # Note that the default options assume that the sampling frequency of a input
 # speech signal is 44.1 kHz.
 function DioOption(;
@@ -67,8 +43,75 @@ function DioOption(;
     DioOption(f0floor, f0ceil, channels_in_octave, period, speed, allowed_range)
 end
 
+
+"""
+HarvestOption represents a set of options that is used in Harvest, a fundamental
+frequency analysis.
+
+**Fields**
+
+$(FIELDS)
+"""
+type HarvestOption
+    f0floor::Cdouble
+    f0ceil::Cdouble
+    "frame period in ms"
+    period::Cdouble
+    function HarvestOption(f0floor, f0ceil, period)
+        f0floor > f0ceil && throw(ArgumentError("F0floor must be larger than F0ceil"))
+        f0floor < 0 && throw(ArgumentError("f0floor must be positive"))
+        period <= 0 && throw(ArgumentError("period must be positive"))
+        new(f0floor, f0ceil, period)
+    end
+end
+
+function HarvestOption(;
+                   f0floor::Float64=71.0,
+                   f0ceil::Float64=800.0,
+                   period::Float64=5.0)
+   HarvestOption(f0floor, f0ceil, period)
+end
+
+"""
+CheapTrick options
+
+**Fields**
+
+$(FIELDS)
+"""
+type CheapTrickOption
+    q1::Cdouble
+    f0floor::Cdouble
+    fftsize::Cint
+    function CheapTrickOption(fs; q1=-0.15, f0floor=71.0)
+        p = new()
+        ccall((:InitializeCheapTrickOption, libworld), Void,
+              (Cint, Ptr{CheapTrickOption},), fs, &p)
+        p.q1 = q1
+        p.f0floor = f0floor
+        p
+    end
+end
+
+"""
+D4C options (nothing for now, but for future changes)
+
+**Fields**
+
+$(FIELDS)
+"""
+immutable D4COption
+    threshold::Cdouble
+    D4COption(threshold=0.85) = new(threshold)
+end
+
 function get_samples_for_dio(fs::Real, len::Integer, period::Real)
     ccall((:GetSamplesForDIO, libworld), Cint,
+          (Cint, Cint, Cdouble), fs, len, period)
+end
+
+function get_samples_for_harvest(fs::Real, len::Integer, period::Real)
+    ccall((:GetSamplesForHarvest, libworld), Cint,
           (Cint, Cint, Cdouble), fs, len, period)
 end
 
@@ -93,10 +136,35 @@ function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
     f0 = Array{Cdouble}(expectedlen)
     timeaxis = Array{Cdouble}(expectedlen)
-    # Note that value passinig of julia-type to C-struct doesn't work.
-    ccall((:DioByOptPtr, libworld),  Void,
-          (Ptr{Cdouble}, Cint, Cint, Ptr{DioOption}, Ptr{Cdouble}, Ptr{Cdouble}),
-          x, length(x), fs, &opt, timeaxis, f0)
+    ccall((:Dio, libworld),  Void,
+          (Ptr{Cdouble}, Cint, Cint, Ref{DioOption}, Ptr{Cdouble}, Ptr{Cdouble}),
+          x, length(x), fs, opt, timeaxis, f0)
+    f0, timeaxis
+end
+
+"""
+$(SIGNATURES)
+
+Harvest estimates F0 trajectory given a monoral input signal.
+
+**Paremters**
+
+- `x`  : Input signal
+- `fs` : Sampling frequency
+- `opt` : HarvestOption
+
+**Returns**
+
+- `time_axis`  : Temporal positions.
+- `f0`         : F0 contour.
+"""
+function harvest(x::StridedVector{Cdouble}, fs::Real, opt::HarvestOption=HarvestOption())
+    expectedlen = get_samples_for_harvest(fs, length(x), opt.period)
+    f0 = Array{Cdouble}(expectedlen)
+    timeaxis = Array{Cdouble}(expectedlen)
+    ccall((:Harvest, libworld),  Void,
+          (Ptr{Cdouble}, Cint, Cint, Ref{HarvestOption}, Ptr{Cdouble}, Ptr{Cdouble}),
+          x, length(x), fs, opt, timeaxis, f0)
     f0, timeaxis
 end
 
@@ -143,13 +211,16 @@ frequency and the lower limit of f0 (It is defined in world.h).
 **Parameters**
 
 - `fs`: Sampling frequency
+- `opt`: CheapTrickOption
 
 **Returns**
 
 - `fftsize` : FFT size
 """
-function get_fftsize_for_cheaptrick(fs::Integer)
-    fftsize = ccall((:GetFFTSizeForCheapTrick, libworld), Cint, (Cint,), fs)
+function get_fftsize_for_cheaptrick(fs::Integer,
+                                    opt::CheapTrickOption=CheapTrickOption(fs))
+    fftsize = ccall((:GetFFTSizeForCheapTrick, libworld), Cint,
+                    (Cint,Ptr{CheapTrickOption}), fs, &opt)
     convert(Int, fftsize)
 end
 
@@ -174,9 +245,9 @@ estimated by CheapTrick.
 function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
                     timeaxis::StridedVector{Cdouble},
                     f0::StridedVector{Cdouble};
-                    opt::CheapTrickOption=CheapTrickOption()
+                    opt::CheapTrickOption=CheapTrickOption(fs)
     )
-    freqbins = get_fftsize_for_cheaptrick(fs)>>1 + 1
+    freqbins = get_fftsize_for_cheaptrick(fs, opt)>>1 + 1
     spectrogram = Array{Cdouble}(freqbins, length(f0))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
@@ -216,7 +287,7 @@ function d4c(x::StridedVector{Cdouble}, fs::Integer,
              timeaxis::StridedVector{Cdouble},
              f0::StridedVector{Cdouble};
              opt::D4COption=D4COption())
-    fftsize = get_fftsize_for_cheaptrick(fs)
+    fftsize = get_fftsize_for_cheaptrick(fs, CheapTrickOption(fs))
     freqbins = fftsize>>1 + 1
     aperiodicity = zeros(Cdouble, freqbins, length(f0))
 
@@ -261,7 +332,7 @@ function synthesis(f0::StridedVector{Cdouble},
                    spectrogram::StridedMatrix{Cdouble},
                    aperiodicity::StridedMatrix{Cdouble},
                    period::Real, fs::Integer, len::Integer)
-    fftsize = get_fftsize_for_cheaptrick(fs)
+    fftsize = get_fftsize_for_cheaptrick(fs, CheapTrickOption(fs))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
     cspectrogram = Array{Ptr{Cdouble}}(size(spectrogram, 2))
