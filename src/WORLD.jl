@@ -1,9 +1,9 @@
 __precompile__()
 
 """
-A lightweitht julia wrapper for [WORLD](https://github.com/mmorise/World)
-- a high-quality speech analysis, manipulation and
-synthesis system. WORLD provides a way to decompose a speech signal into:
+A lightweitht julia wrapper for [WORLD](https://github.com/mmorise/World),
+a high-quality speech analysis, manipulation and synthesis system.
+WORLD provides a way to decompose a speech signal into:
 
 - Fundamental frequency (F0)
 - spectral envelope
