@@ -127,7 +127,7 @@ approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
 
 For the complete code of visualizations shown above, please check
 [the IJulia notebook](\
-    http://nbviewer.jupyter.org/github/r9y9/WORLD.jl/blob/master/notebooks/WORLD-demo.ipynb).
+    http://nbviewer.jupyter.org/github/r9y9/WORLD.jl/blob/master/docs/src/assets/WORLD-demo.ipynb).
 
 ## Exports
 
@@ -170,10 +170,10 @@ end
 # v0.2.1-4 breaks API of CheapTrick and D4C, and it's hard to support both old
 # and new WORLD library, so throws an error when older version of WORLD is
 # detected.
-if version < v"0.2.1-4"
+if version < v"0.3.0"
     error("""Binary dependency incompatibility
 
-          WORLD version 0.2.1-4 or later must be required ($(version) is detected).
+          WORLD version 0.3.0 or later must be required ($(version) is detected).
           If you have WORLD installed on your system paths, please get the latest
           stable WORLD and install it, and then re-build WORLD.jl with:
 
