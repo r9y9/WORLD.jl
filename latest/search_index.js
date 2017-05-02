@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.dio",
     "category": "Function",
-    "text": "dio(x, fs, opt)\ndio(x, fs)\n\n\nDio estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : DioOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
+    "text": "dio(x, fs)\ndio(x, fs, opt)\n\n\nDio estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : DioOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
 },
 
 {
@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.get_fftsize_for_cheaptrick",
     "category": "Function",
-    "text": "get_fftsize_for_cheaptrick(fs)\nget_fftsize_for_cheaptrick(fs, opt)\n\n\nGetFFTSizeForCheapTrick calculates the FFT size based on the sampling frequency and the lower limit of f0 (It is defined in world.h).\n\nParameters\n\nfs: Sampling frequency\nopt: CheapTrickOption\n\nReturns\n\nfftsize : FFT size\n\n\n\n"
+    "text": "get_fftsize_for_cheaptrick(fs, opt)\nget_fftsize_for_cheaptrick(fs)\n\n\nGetFFTSizeForCheapTrick calculates the FFT size based on the sampling frequency and the lower limit of f0 (It is defined in world.h).\n\nParameters\n\nfs: Sampling frequency\nopt: CheapTrickOption\n\nReturns\n\nfftsize : FFT size\n\n\n\n"
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.harvest",
     "category": "Function",
-    "text": "harvest(x, fs, opt)\nharvest(x, fs)\n\n\nHarvest estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : HarvestOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
+    "text": "harvest(x, fs)\nharvest(x, fs, opt)\n\n\nHarvest estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : HarvestOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
 },
 
 {
