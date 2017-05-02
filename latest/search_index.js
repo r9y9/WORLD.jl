@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD",
     "category": "Module",
-    "text": "A lightweitht julia wrapper for WORLD\n\na high-quality speech analysis, manipulation and\n\nsynthesis system. WORLD provides a way to decompose a speech signal into:\n\nFundamental frequency (F0)\nspectral envelope\naperiodicity\n\nand re-synthesize a speech signal from these paramters. Please see the project page for more details on the WORLD.\n\nnote: Note\nWORLD.jl is based on a modified version of WORLD (r9y9/WORLD).\n\nhttps://github.com/r9y9/WORLD.jl\n\nUsage\n\nIn the following examples, suppose x::Vector{Float64} is a input monoral speech signal like:\n\n(Image: )\n\nF0 estimation and refinement\n\nDIO\n\nopt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0,\n        period=period, speed=1)\nf0, timeaxis = dio(x, fs, opt)\n\n(Image: )\n\nStoneMask\n\nf0 = stonemask(x, fs, timeaxis, f0)\n\n(Image: )\n\nSpectral envelope estimation by CheapTrick\n\nspectrogram = cheaptrick(x, fs, timeaxis, f0)\n\n(Image: )\n\nAperiodicity ratio estimation by D4C\n\naperiodicity = d4c(x, fs, timeaxis, f0)\n\n(Image: )\n\nSynthesis\n\ny = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))\n\n(Image: )\n\nCompact speech parameterization\n\nRaw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1025) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.\n\nspectrum envelope to mel-cepstrum\n\nmc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41\n\nwhere order is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter.\n\n(Image: )\n\nmel-cepstrum to spectrum envelope\n\napproximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))\n\n(Image: )\n\naperiodicity spectrum to aperiodicity mel-cesptrum\n\nap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41\n\n(Image: )\n\nnote: Note\nHTS v2.3 beta seems to parameterize aperiodicity spectrum in this way (but does this really make sense?).\n\naperiodicity mel-cepstrum to aperiodicity spectrum\n\napproximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))\n\n(Image: )\n\nFor the complete code of visualizations shown above, please check the IJulia notebook.\n\nExports\n\nCheapTrickOption\nD4COption\nDioOption\ncheaptrick\nd4c\ndio\nget_fftsize_for_cheaptrick\ninterp1\ninterp1!\nmc2sp\nsp2mc\nstonemask\nsynthesis\n\n\n\n"
+    "text": "A lightweitht julia wrapper for WORLD\n\na high-quality speech analysis, manipulation and\n\nsynthesis system. WORLD provides a way to decompose a speech signal into:\n\nFundamental frequency (F0)\nspectral envelope\naperiodicity\n\nand re-synthesize a speech signal from these paramters. Please see the project page for more details on the WORLD.\n\nnote: Note\nWORLD.jl is based on a modified version of WORLD (r9y9/WORLD).\n\nhttps://github.com/r9y9/WORLD.jl\n\nUsage\n\nIn the following examples, suppose x::Vector{Float64} is a input monoral speech signal like:\n\n(Image: )\n\nF0 estimation and refinement\n\nDIO\n\nopt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0,\n        period=period, speed=1)\nf0, timeaxis = dio(x, fs, opt)\n\n(Image: )\n\nStoneMask\n\nf0 = stonemask(x, fs, timeaxis, f0)\n\n(Image: )\n\nSpectral envelope estimation by CheapTrick\n\nspectrogram = cheaptrick(x, fs, timeaxis, f0)\n\n(Image: )\n\nAperiodicity ratio estimation by D4C\n\naperiodicity = d4c(x, fs, timeaxis, f0)\n\n(Image: )\n\nSynthesis\n\ny = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))\n\n(Image: )\n\nCompact speech parameterization\n\nRaw spectrum envelope and aperiodicity spectrum are relatively high dimentional (offen more than 513 or 1025) so one might want to get more compact representation. To do so, mel-cepstrum could be a good choice. As far as I know, this would be useful in statistical speech synthesis and statistical voice conversion.\n\nspectrum envelope to mel-cepstrum\n\nmc = sp2mc(spectrogram, order, α) # e.g. order=40, α=0.41\n\nwhere order is the order of mel-cepstrum (except for 0th) and α is a frequency warping parameter.\n\n(Image: )\n\nmel-cepstrum to spectrum envelope\n\napproximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))\n\n(Image: )\n\naperiodicity spectrum to aperiodicity mel-cesptrum\n\nap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41\n\n(Image: )\n\nnote: Note\nHTS v2.3 beta seems to parameterize aperiodicity spectrum in this way (but does this really make sense?).\n\naperiodicity mel-cepstrum to aperiodicity spectrum\n\napproximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))\n\n(Image: )\n\nFor the complete code of visualizations shown above, please check the IJulia notebook.\n\nExports\n\nCheapTrickOption\nD4COption\nDioOption\nHarvestOption\ncheaptrick\nd4c\ndio\nget_fftsize_for_cheaptrick\nharvest\ninterp1\ninterp1!\nmc2sp\nsp2mc\nstonemask\nsynthesis\n\n\n\n"
 },
 
 {
@@ -57,11 +57,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#WORLD.get_fftsize_for_cheaptrick-Tuple{Integer}",
+    "location": "index.html#WORLD.get_fftsize_for_cheaptrick",
     "page": "Home",
     "title": "WORLD.get_fftsize_for_cheaptrick",
-    "category": "Method",
-    "text": "get_fftsize_for_cheaptrick(fs)\n\n\nGetFFTSizeForCheapTrick calculates the FFT size based on the sampling frequency and the lower limit of f0 (It is defined in world.h).\n\nParameters\n\nfs: Sampling frequency\n\nReturns\n\nfftsize : FFT size\n\n\n\n"
+    "category": "Function",
+    "text": "get_fftsize_for_cheaptrick(fs, opt)\nget_fftsize_for_cheaptrick(fs)\n\n\nGetFFTSizeForCheapTrick calculates the FFT size based on the sampling frequency and the lower limit of f0 (It is defined in world.h).\n\nParameters\n\nfs: Sampling frequency\nopt: CheapTrickOption\n\nReturns\n\nfftsize : FFT size\n\n\n\n"
+},
+
+{
+    "location": "index.html#WORLD.harvest",
+    "page": "Home",
+    "title": "WORLD.harvest",
+    "category": "Function",
+    "text": "harvest(x, fs)\nharvest(x, fs, opt)\n\n\nHarvest estimates F0 trajectory given a monoral input signal.\n\nParemters\n\nx  : Input signal\nfs : Sampling frequency\nopt : HarvestOption\n\nReturns\n\ntime_axis  : Temporal positions.\nf0         : F0 contour.\n\n\n\n"
 },
 
 {
@@ -117,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.CheapTrickOption",
     "category": "Type",
-    "text": "CheapTrick options\n\nFields\n\nq1\n\n\n\n"
+    "text": "CheapTrick options\n\nFields\n\nq1\nf0floor\nfftsize\n\n\n\n"
 },
 
 {
@@ -125,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.D4COption",
     "category": "Type",
-    "text": "D4C options (nothing for now, but for future changes)\n\nFields\n\ndummy\n\n\n\n"
+    "text": "D4C options (nothing for now, but for future changes)\n\nFields\n\nthreshold\n\n\n\n"
 },
 
 {
@@ -134,6 +142,14 @@ var documenterSearchIndex = {"docs": [
     "title": "WORLD.DioOption",
     "category": "Type",
     "text": "DioOption represents a set of options that is used in DIO, a fundamental frequency analysis.\n\nFields\n\nf0floor\nf0ceil\nchannels_in_octave\nperiod\nframe period in ms\nspeed\nallowed_range\nadded in v0.2.1-2 (WORLD 0.2.0_2)\n\n\n\n"
+},
+
+{
+    "location": "index.html#WORLD.HarvestOption",
+    "page": "Home",
+    "title": "WORLD.HarvestOption",
+    "category": "Type",
+    "text": "HarvestOption represents a set of options that is used in Harvest, a fundamental frequency analysis.\n\nFields\n\nf0floor\nf0ceil\nperiod\nframe period in ms\n\n\n\n"
 },
 
 {
