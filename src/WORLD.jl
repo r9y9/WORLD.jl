@@ -1,8 +1,7 @@
 __precompile__()
 
 """
-A lightweitht julia wrapper for [WORLD](\
-    http://ml.cs.yamanashi.ac.jp/world/english/index.html)
+A lightweitht julia wrapper for [WORLD](https://github.com/mmorise/World)
 - a high-quality speech analysis, manipulation and
 synthesis system. WORLD provides a way to decompose a speech signal into:
 
@@ -14,8 +13,8 @@ and re-synthesize a speech signal from these paramters. Please see the project
 page for more details on the WORLD.
 
 !!! note
-    WORLD.jl is based on a modified version of WORLD ([r9y9/WORLD](\
-    https://github.com/r9y9/WORLD)).
+    WORLD.jl is based on a fork of WORLD ([r9y9/World-cmake](\
+    https://github.com/r9y9/World-cmake)).
 
 [https://github.com/r9y9/WORLD.jl](https://github.com/r9y9/WORLD.jl)
 
@@ -26,9 +25,18 @@ speech signal like:
 
 ![](assets/x.png)
 
-### F0 estimation and refinement
+### F0 estimation
 
-#### DIO
+#### Harvest
+
+```julia
+opt = HarvestOption(71.0, 800.0, period)
+f0, timeaxis = harvest(x, fs, opt)
+```
+
+![](assets/f0_by_harvest.png)
+
+#### Dio
 
 ```julia
 opt = DioOption(f0floor=71.0, f0ceil=800.0, channels_in_octave=2.0,
@@ -119,7 +127,7 @@ approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
 
 For the complete code of visualizations shown above, please check
 [the IJulia notebook](\
-    http://nbviewer.ipython.org/github/r9y9/WORLD.jl/blob/master/docs/src/assets/Demonstration%20of%20WORLD.jl.ipynb).
+    http://nbviewer.jupyter.org/github/r9y9/WORLD.jl/blob/master/notebooks/WORLD-demo.ipynb).
 
 ## Exports
 

@@ -11,7 +11,7 @@
 [![Coverage Status](https://coveralls.io/repos/r9y9/WORLD.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/WORLD.jl?branch=master)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
-The Julia wrapper for [WORLD](http://ml.cs.yamanashi.ac.jp/world/english/index.html) - a high-quality speech analysis, modification and synthesis system.
+The Julia wrapper for [WORLD](https://github.com/mmorise/World) - a high-quality speech analysis, modification and synthesis system.
 
 ## Documentation
 
