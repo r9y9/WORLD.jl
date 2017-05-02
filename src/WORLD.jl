@@ -129,7 +129,8 @@ module WORLD
 
 using DocStringExtensions
 
-export DioOption, CheapTrickOption, D4COption, dio, stonemask, cheaptrick,
+export DioOption, HarvestOption, CheapTrickOption, D4COption, dio, harvest,
+    stonemask, cheaptrick,
     d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp
 
 
