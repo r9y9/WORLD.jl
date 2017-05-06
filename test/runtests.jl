@@ -211,3 +211,22 @@ let
     interp1!(freqaxis_src, logspec, freqaxis_dst, interpolated_logspec2)
     @test interpolated_logspec == interpolated_logspec2
 end
+
+# Codec
+
+let
+    opt = HarvestOption(71.0, 800.0, 5.0)
+    f0, timeaxis = harvest(x, fs, opt)
+    aperiodicity = d4c(x, fs, timeaxis, f0)
+
+    coded_aperiodicity = code_aperiodicity(aperiodicity, fs)
+    decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
+    @test size(aperiodicity) == size(decoded_aperiodicity)
+    @test size(coded_aperiodicity, 2) == size(aperiodicity, 2)
+    @test size(coded_aperiodicity, 1) == get_number_of_aperiodicities(fs)
+
+    decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
+
+    nmse = norm(log.(aperiodicity) - log.(decoded_aperiodicity)) / norm(log.(aperiodicity))
+    @test nmse <= 0.002
+end

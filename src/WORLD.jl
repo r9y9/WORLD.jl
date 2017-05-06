@@ -105,25 +105,21 @@ approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 
 ![](assets/envelope_reconstructed_from_melcepstrum.png)
 
-#### aperiodicity spectrum to aperiodicity mel-cesptrum
+#### Code aperiodicity
 
 ```julia
-ap_mc = sp2mc(aperiodicity, order, α) # e.g. order=40, α=0.41
+coded_aperiodicity = code_aperiodicity(aperiodicity, fs)
 ```
 
-![](assets/aperiodicity_melcepstrum.png)
+![](assets/coded_melcepstrum.png)
 
-!!! note
-    HTS v2.3 beta seems to parameterize aperiodicity spectrum in this way
-    (but does this really make sense?).
-
-#### aperiodicity mel-cepstrum to aperiodicity spectrum
+#### Decode aperiodicity
 
 ```julia
-approximate_aperiodicity = mc2sp(ap_mc, α, get_fftsize_for_cheaptrick(fs))
+decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
 ```
 
-![](assets/approximate_aperiodicity.png)
+![](assets/decoded_aperiodicity.png)
 
 For the complete code of visualizations shown above, please check
 [the IJulia notebook](\
@@ -139,7 +135,8 @@ using DocStringExtensions
 
 export DioOption, HarvestOption, CheapTrickOption, D4COption, dio, harvest,
     stonemask, cheaptrick,
-    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp
+    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp,
+    get_number_of_aperiodicities, code_aperiodicity, decode_aperiodicity
 
 
 ### Binary dependency loading ###
@@ -190,7 +187,7 @@ if version < v"0.3.0"
          """)
 end
 
-for name in ["bridge", "mcep", "deprecated"]
+for name in ["bridge", "codec", "mcep", "deprecated"]
     include(string(name, ".jl"))
 end
 
