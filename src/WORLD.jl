@@ -139,7 +139,8 @@ using DocStringExtensions
 
 export DioOption, HarvestOption, CheapTrickOption, D4COption, dio, harvest,
     stonemask, cheaptrick,
-    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp
+    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp,
+    get_number_of_aperiodicities, code_aperiodicity, decode_aperiodicity
 
 
 ### Binary dependency loading ###
@@ -190,7 +191,7 @@ if version < v"0.3.0"
          """)
 end
 
-for name in ["bridge", "mcep", "deprecated"]
+for name in ["bridge", "codec", "mcep", "deprecated"]
     include(string(name, ".jl"))
 end
 
