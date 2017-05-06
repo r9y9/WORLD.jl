@@ -82,9 +82,10 @@ y = synthesis(f0, spectrogram, aperiodicity, period, fs, length(x))
 
 Raw spectrum envelope and aperiodicity spectrum are relatively high dimentional
 (offen more than 513 or 1025) so one might want to get more compact
-representation. To do so, mel-cepstrum could be a good choice. As far as I know,
-this would be useful in statistical speech synthesis and statistical voice
-conversion.
+representation. To handle this situation, WORLD provides coding/decoding APIs
+for spectrum envelope and aperiodicity. Additionally, WORLD.jl provides
+conversions from spectrum envelope to mel-cepstrum and vice versa. You can choose
+any of coding/decoding APIs depends on your purpose.
 
 #### spectrum envelope to mel-cepstrum
 
@@ -111,7 +112,7 @@ approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 coded_aperiodicity = code_aperiodicity(aperiodicity, fs)
 ```
 
-![](assets/coded_melcepstrum.png)
+![](assets/coded_aperiodicity.png)
 
 #### Decode aperiodicity
 
@@ -134,9 +135,10 @@ module WORLD
 using DocStringExtensions
 
 export DioOption, HarvestOption, CheapTrickOption, D4COption, dio, harvest,
-    stonemask, cheaptrick,
-    d4c, synthesis, get_fftsize_for_cheaptrick, interp1!, interp1, sp2mc, mc2sp,
-    get_number_of_aperiodicities, code_aperiodicity, decode_aperiodicity
+    stonemask, cheaptrick, d4c, synthesis, get_fftsize_for_cheaptrick,
+    interp1!, interp1, sp2mc, mc2sp,
+    get_number_of_aperiodicities, code_aperiodicity, decode_aperiodicity,
+    code_spectral_envelope, decode_spectral_envelope
 
 
 ### Binary dependency loading ###
