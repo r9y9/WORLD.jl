@@ -111,7 +111,7 @@ approximate_spectrogram = mc2sp(mc, α, get_fftsize_for_cheaptrick(fs))
 coded_aperiodicity = code_aperiodicity(aperiodicity, fs)
 ```
 
-![](assets/coded_melcepstrum.png)
+![](assets/coded_aperiodicity.png)
 
 #### Decode aperiodicity
 
