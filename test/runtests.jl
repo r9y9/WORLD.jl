@@ -119,15 +119,15 @@ let
 
     # check normalized mean squared error
     approximate_spec = mc2sp(sp2mc(spec, 25, α), α, fftlen)
-    nmse25 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
+    nmse25 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
     @test nmse25 <= 0.06
 
     approximate_spec = mc2sp(sp2mc(spec, 30, α), α, fftlen)
-    nmse30 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
+    nmse30 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
     @test nmse30 <= 0.06
 
     approximate_spec = mc2sp(sp2mc(spec, 40, α), α, fftlen)
-    nmse40 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
+    nmse40 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
     @test nmse40 <= 0.05
 
     @test nmse25 > nmse30 > nmse40
@@ -141,13 +141,13 @@ end
 
 # get_fftsize
 
-for fs in [16000, 20000]
-    c = get_fftsize_for_cheaptrick(fs)
+for _fs in [16000, 20000]
+    c = get_fftsize_for_cheaptrick(_fs)
     @test c == 1024
 end
 
-for fs in [44100, 48000]
-    c = get_fftsize_for_cheaptrick(fs)
+for _fs in [44100, 48000]
+    c = get_fftsize_for_cheaptrick(_fs)
     @test c == 2048
 end
 
@@ -227,6 +227,29 @@ let
 
     decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
 
-    nmse = norm(log.(aperiodicity) - log.(decoded_aperiodicity)) / norm(log.(aperiodicity))
+    nmse = vecnorm(log.(aperiodicity) - log.(decoded_aperiodicity)) / vecnorm(log.(aperiodicity))
     @test nmse <= 0.002
+end
+
+function test_code_spectral_envelope(dim, tol)
+    println("test_code_spectral_envelope: dim=$(dim)")
+
+    opt = HarvestOption(71.0, 800.0, 5.0)
+    f0, timeaxis = harvest(x, fs, opt)
+    spectrogram = cheaptrick(x, fs, timeaxis, f0)
+    fftsize = get_fftsize_for_cheaptrick(fs)
+
+    coded_spectrogram = code_spectral_envelope(spectrogram, fs, fftsize, dim)
+    @test size(coded_spectrogram, 2) == size(spectrogram, 2)
+    @test size(coded_spectrogram, 1) == dim
+
+    decoded_spectrogram = decode_spectral_envelope(coded_spectrogram, fs, fftsize)
+
+    nmse = vecnorm(log.(spectrogram) - log.(decoded_spectrogram)) / vecnorm(log.(spectrogram))
+    @test nmse <= tol
+end
+
+# TODO:should tighten tolerances
+for (dim, tol) in [(20, 0.3), (30, 0.3), (40, 0.3), (50, 0.3), (60, 0.3)]
+    test_code_spectral_envelope(dim, tol)
 end
