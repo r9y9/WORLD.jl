@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.code_aperiodicity",
     "category": "Function",
-    "text": "code_aperiodicity(aperiodicity, fs, fftsize)\ncode_aperiodicity(aperiodicity, fs)\n\n\nCodeAperiodicity codes the aperiodicity. The number of dimensions is determined by fs.\n\nParameters\n\naperiodicity : Aperiodicity before coding\nfs : Sampling frequency\nfftsize : FFT size (default : get_fftsize_for_cheaptrick(fs))\n\nReturns\n\ncoded_aperiodicity : Coded aperiodicity\n\n\n\n"
+    "text": "code_aperiodicity(aperiodicity, fs)\ncode_aperiodicity(aperiodicity, fs, fftsize)\n\n\nCodeAperiodicity codes the aperiodicity. The number of dimensions is determined by fs.\n\nParameters\n\naperiodicity : Aperiodicity before coding\nfs : Sampling frequency\nfftsize : FFT size (default : get_fftsize_for_cheaptrick(fs))\n\nReturns\n\ncoded_aperiodicity : Coded aperiodicity\n\n\n\n"
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "WORLD.decode_aperiodicity",
     "category": "Function",
-    "text": "decode_aperiodicity(coded_aperiodicity, fs)\ndecode_aperiodicity(coded_aperiodicity, fs, fftsize)\n\n\nDecodeAperiodicity decoes the coded aperiodicity.\n\nParameters\n\ncoded_aperiodicity : Coded aperiodicity\nfs : Sampling frequency\nfftsize : FFT size (default : get_fftsize_for_cheaptrick(fs))\n\nReturns\n\naperiodicity : Decoded aperiodicity\n\n\n\n"
+    "text": "decode_aperiodicity(coded_aperiodicity, fs, fftsize)\ndecode_aperiodicity(coded_aperiodicity, fs)\n\n\nDecodeAperiodicity decoes the coded aperiodicity.\n\nParameters\n\ncoded_aperiodicity : Coded aperiodicity\nfs : Sampling frequency\nfftsize : FFT size (default : get_fftsize_for_cheaptrick(fs))\n\nReturns\n\naperiodicity : Decoded aperiodicity\n\n\n\n"
 },
 
 {
