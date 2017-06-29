@@ -89,6 +89,7 @@ type CheapTrickOption
               (Cint, Ptr{CheapTrickOption},), fs, &p)
         p.q1 = q1
         p.f0floor = f0floor
+        p.fftsize = get_fftsize_for_cheaptrick(Int(fs), p)
         p
     end
 end
