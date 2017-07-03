@@ -1,5 +1,7 @@
 ## conversion between spectrum envelop and mel-cepstrum
 
+using FFTW
+
 # TODO(ryuichi) import from MelGeneralizedCepstrums or SPTK
 # copied from r9y9/MelGeneralizedCepstrums.jl
 function freqt!(wc::AbstractVector, c::AbstractVector, α;
