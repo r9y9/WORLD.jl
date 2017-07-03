@@ -6,7 +6,7 @@ frequency analysis.
 
 $(FIELDS)
 """
-type DioOption
+mutable struct DioOption
     f0floor::Cdouble
     f0ceil::Cdouble
     channels_in_octave::Cdouble
@@ -52,7 +52,7 @@ frequency analysis.
 
 $(FIELDS)
 """
-type HarvestOption
+mutable struct HarvestOption
     f0floor::Cdouble
     f0ceil::Cdouble
     "frame period in ms"
@@ -79,7 +79,7 @@ CheapTrick options
 
 $(FIELDS)
 """
-type CheapTrickOption
+mutable struct CheapTrickOption
     q1::Cdouble
     f0floor::Cdouble
     fftsize::Cint
@@ -101,7 +101,7 @@ D4C options (nothing for now, but for future changes)
 
 $(FIELDS)
 """
-immutable D4COption
+mutable struct D4COption
     threshold::Cdouble
     D4COption(threshold=0.85) = new(threshold)
 end
