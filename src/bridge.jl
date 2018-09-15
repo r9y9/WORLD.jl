@@ -85,8 +85,8 @@ mutable struct CheapTrickOption
     fftsize::Cint
     function CheapTrickOption(fs; q1=-0.15, f0floor=71.0)
         p = new()
-        ccall((:InitializeCheapTrickOption, libworld), Void,
-              (Cint, Ptr{CheapTrickOption},), fs, &p)
+        ccall((:InitializeCheapTrickOption, libworld), Cvoid,
+              (Cint, Ptr{CheapTrickOption},), fs, Ref(p))
         p.q1 = q1
         p.f0floor = f0floor
         p.fftsize = get_fftsize_for_cheaptrick(Int(fs), p)
@@ -135,9 +135,9 @@ Dio estimates F0 trajectory given a monoral input signal.
 """
 function dio(x::StridedVector{Cdouble}, fs::Real, opt::DioOption=DioOption())
     expectedlen = get_samples_for_dio(fs, length(x), opt.period)
-    f0 = Array{Cdouble}(expectedlen)
-    timeaxis = Array{Cdouble}(expectedlen)
-    ccall((:Dio, libworld),  Void,
+    f0 = Array{Cdouble}(undef, expectedlen)
+    timeaxis = Array{Cdouble}(undef, expectedlen)
+    ccall((:Dio, libworld),  Cvoid,
           (Ptr{Cdouble}, Cint, Cint, Ref{DioOption}, Ptr{Cdouble}, Ptr{Cdouble}),
           x, length(x), fs, opt, timeaxis, f0)
     f0, timeaxis
@@ -161,9 +161,9 @@ Harvest estimates F0 trajectory given a monoral input signal.
 """
 function harvest(x::StridedVector{Cdouble}, fs::Real, opt::HarvestOption=HarvestOption())
     expectedlen = get_samples_for_harvest(fs, length(x), opt.period)
-    f0 = Array{Cdouble}(expectedlen)
-    timeaxis = Array{Cdouble}(expectedlen)
-    ccall((:Harvest, libworld),  Void,
+    f0 = Array{Cdouble}(undef, expectedlen)
+    timeaxis = Array{Cdouble}(undef, expectedlen)
+    ccall((:Harvest, libworld),  Cvoid,
           (Ptr{Cdouble}, Cint, Cint, Ref{HarvestOption}, Ptr{Cdouble}, Ptr{Cdouble}),
           x, length(x), fs, opt, timeaxis, f0)
     f0, timeaxis
@@ -188,8 +188,8 @@ StoneMask refines the estimated F0 by Dio,
 function stonemask(x::StridedVector{Cdouble}, fs::Integer,
                    timeaxis::StridedVector{Cdouble},
                    f0::StridedVector{Cdouble})
-    refinedF0 = Array{Cdouble}(length(f0))
-    ccall((:StoneMask, libworld),  Void,
+    refinedF0 = Array{Cdouble}(undef, length(f0))
+    ccall((:StoneMask, libworld),  Cvoid,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
            Ptr{Cdouble}),
           x, length(x), fs, timeaxis, f0, length(f0), refinedF0)
@@ -197,7 +197,7 @@ function stonemask(x::StridedVector{Cdouble}, fs::Integer,
 end
 
 # Array{T,2} -> Array{Ptr{T}}
-function ptrarray2d!{T<:Real}(dst::Array{Ptr{T},1}, src::Array{T,2})
+function ptrarray2d!(dst::Array{Ptr{T},1}, src::Array{T,2}) where {T<:Real}
     for i=1:size(src, 2)
         @inbounds dst[i] = pointer(view(src, 1:size(src, 1), i), 1)
     end
@@ -221,7 +221,7 @@ frequency and the lower limit of f0 (It is defined in world.h).
 function get_fftsize_for_cheaptrick(fs::Integer,
                                     opt::CheapTrickOption=CheapTrickOption(fs))
     fftsize = ccall((:GetFFTSizeForCheapTrick, libworld), Cint,
-                    (Cint,Ptr{CheapTrickOption}), fs, &opt)
+                    (Cint,Ptr{CheapTrickOption}), fs, Ref(opt))
     convert(Int, fftsize)
 end
 
@@ -249,16 +249,16 @@ function cheaptrick(x::StridedVector{Cdouble}, fs::Integer,
                     opt::CheapTrickOption=CheapTrickOption(fs)
     )
     freqbins = get_fftsize_for_cheaptrick(fs, opt)>>1 + 1
-    spectrogram = Array{Cdouble}(freqbins, length(f0))
+    spectrogram = Array{Cdouble}(undef, freqbins, length(f0))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array{Ptr{Cdouble}}(size(spectrogram, 2))
+    cspectrogram = Array{Ptr{Cdouble}}(undef, size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
-    ccall((:CheapTrick, libworld), Void,
+    ccall((:CheapTrick, libworld), Cvoid,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint,
            Ptr{CheapTrickOption}, Ptr{Ptr{Cdouble}}),
-          x, length(x), fs, timeaxis, f0, length(f0), &opt, cspectrogram)
+          x, length(x), fs, timeaxis, f0, length(f0), Ref(opt), cspectrogram)
 
     # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
     for i=1:length(f0), j=1:freqbins
@@ -293,13 +293,13 @@ function d4c(x::StridedVector{Cdouble}, fs::Integer,
     aperiodicity = zeros(Cdouble, freqbins, length(f0))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    caperiodicity = Array{Ptr{Cdouble}}(size(aperiodicity, 2))
+    caperiodicity = Array{Ptr{Cdouble}}(undef, size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    ccall((:D4C, libworld), Void,
+    ccall((:D4C, libworld), Cvoid,
           (Ptr{Cdouble}, Cint, Cint, Ptr{Cdouble}, Ptr{Cdouble}, Cint, Cint,
            Ptr{D4COption}, Ptr{Ptr{Cdouble}}),
-          x, length(x), fs, timeaxis, f0, length(f0), fftsize, &opt,
+          x, length(x), fs, timeaxis, f0, length(f0), fftsize, Ref(opt),
           caperiodicity)
 
     # Array{Cdouble,2} <- Array{Ptr{Cdouble}}
@@ -336,14 +336,14 @@ function synthesis(f0::StridedVector{Cdouble},
     fftsize = get_fftsize_for_cheaptrick(fs, CheapTrickOption(fs))
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array{Ptr{Cdouble}}(size(spectrogram, 2))
+    cspectrogram = Array{Ptr{Cdouble}}(undef, size(spectrogram, 2))
     ptrarray2d!(cspectrogram, spectrogram)
 
-    caperiodicity = Array{Ptr{Cdouble}}(size(aperiodicity, 2))
+    caperiodicity = Array{Ptr{Cdouble}}(undef, size(aperiodicity, 2))
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    synthesized = Array{Cdouble}(len)
-    ccall((:Synthesis, libworld), Void,
+    synthesized = Array{Cdouble}(undef, len)
+    ccall((:Synthesis, libworld), Cvoid,
           (Ptr{Cdouble}, Cint, Ptr{Ptr{Cdouble}}, Ptr{Ptr{Cdouble}},
            Cint, Cdouble, Cint, Cint, Ptr{Cdouble}),
           f0, length(f0), cspectrogram, caperiodicity, fftsize, period, fs, len,
@@ -372,7 +372,7 @@ function interp1!(x::StridedVector{Cdouble},
                   yi::StridedVector{Cdouble})
     @assert length(x) == length(y)
     @assert length(xi) == length(yi)
-    ccall((:interp1, libworld), Void,
+    ccall((:interp1, libworld), Cvoid,
           (Ptr{Cdouble}, Ptr{Cdouble}, Cint, Ptr{Cdouble}, Cint, Ptr{Cdouble}),
           x, y, length(x), xi, length(xi), yi)
     yi

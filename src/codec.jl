@@ -39,14 +39,14 @@ function code_aperiodicity(aperiodicity, fs,
     coded_aperiodicity = zeros(Cdouble, n, f0_length)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    ccoded_aperiodicity = Array{Ptr{Cdouble}}(f0_length)
+    ccoded_aperiodicity = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(ccoded_aperiodicity, coded_aperiodicity)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    caperiodicity = Array{Ptr{Cdouble}}(f0_length)
+    caperiodicity = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    ccall((:CodeAperiodicity, libworld), Void,
+    ccall((:CodeAperiodicity, libworld), Cvoid,
           (Ptr{Ptr{Cdouble}}, Cint, Cint, Cint, Ptr{Ptr{Cdouble}}),
           caperiodicity, f0_length, fs, fftsize, ccoded_aperiodicity)
 
@@ -80,14 +80,14 @@ function decode_aperiodicity(coded_aperiodicity, fs,
     aperiodicity = zeros(Cdouble, freqbins, f0_length)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    ccoded_aperiodicity = Array{Ptr{Cdouble}}(f0_length)
+    ccoded_aperiodicity = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(ccoded_aperiodicity, coded_aperiodicity)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    caperiodicity = Array{Ptr{Cdouble}}(f0_length)
+    caperiodicity = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(caperiodicity, aperiodicity)
 
-    ccall((:DecodeAperiodicity, libworld), Void,
+    ccall((:DecodeAperiodicity, libworld), Cvoid,
           (Ptr{Ptr{Cdouble}}, Cint, Cint, Cint, Ptr{Ptr{Cdouble}}),
           ccoded_aperiodicity, f0_length, fs, fftsize, caperiodicity)
 
@@ -123,14 +123,14 @@ function code_spectral_envelope(spectrogram, fs,
     coded_spectral_envelope = zeros(Cdouble, nd, f0_length)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    ccoded_spectral_envelope = Array{Ptr{Cdouble}}(f0_length)
+    ccoded_spectral_envelope = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(ccoded_spectral_envelope, coded_spectral_envelope)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array{Ptr{Cdouble}}(f0_length)
+    cspectrogram = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(cspectrogram, spectrogram)
 
-    ccall((:CodeSpectralEnvelope, libworld), Void,
+    ccall((:CodeSpectralEnvelope, libworld), Cvoid,
           (Ptr{Ptr{Cdouble}}, Cint, Cint, Cint, Cint, Ptr{Ptr{Cdouble}}),
           cspectrogram, f0_length, fs, fftsize, nd, ccoded_spectral_envelope)
 
@@ -164,14 +164,14 @@ function decode_spectral_envelope(coded_spectral_envelope, fs, fftsize)
     spectrogram = zeros(Cdouble, freqbins, f0_length)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    ccoded_spectral_envelope = Array{Ptr{Cdouble}}(f0_length)
+    ccoded_spectral_envelope = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(ccoded_spectral_envelope, coded_spectral_envelope)
 
     # Array{Cdouble,2} -> Array{Ptr{Cdouble}}
-    cspectrogram = Array{Ptr{Cdouble}}(f0_length)
+    cspectrogram = Array{Ptr{Cdouble}}(undef, f0_length)
     ptrarray2d!(cspectrogram, spectrogram)
 
-    ccall((:DecodeSpectralEnvelope, libworld), Void,
+    ccall((:DecodeSpectralEnvelope, libworld), Cvoid,
           (Ptr{Ptr{Cdouble}}, Cint, Cint, Cint, Cint, Ptr{Ptr{Cdouble}}),
           ccoded_spectral_envelope, f0_length, fs, fftsize, nd, cspectrogram)
 

@@ -4,14 +4,15 @@ os:
   - linux
   - osx
 julia:
-  - 0.6
+  - 0.7
+  - 1.0
   - nightly
 notifications:
   email: false
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.build("WORLD"); Pkg.test("WORLD", coverage=true)'
+  - julia --check-bounds=yes -e 'using Pkg; Pkg.init(); Pkg.clone(pwd()); Pkg.build("WORLD"); Pkg.test("WORLD", coverage=true)'
 after_success:
-- julia -e 'cd(Pkg.dir("WORLD")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
-- julia -e 'Pkg.add("Documenter");'
-- julia -e 'cd(Pkg.dir("WORLD")); include(joinpath("docs", "make.jl"))'
+- julia -e 'using Pkg; cd(Pkg.dir("WORLD")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+- julia -e 'using Pkg; Pkg.add("Documenter");'
+- julia -e 'using Pkg; cd(Pkg.dir("WORLD")); include(joinpath("docs", "make.jl"))'

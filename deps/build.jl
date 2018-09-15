@@ -7,7 +7,7 @@ world = library_dependency("libworld", aliases=["libworld", "world-0"])
 const version = "0.3.1"
 
 # TODO
-if is_windows() && Sys.WORD_SIZE == 32
+if Sys.iswindows() && Sys.WORD_SIZE == 32
     error("Your platform isn't supported yet.")
 end
 

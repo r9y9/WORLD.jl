@@ -1,5 +1,5 @@
 using WORLD
-using Base.Test
+using Test, DelimitedFiles, LinearAlgebra, Statistics
 
 @show WORLD.version
 
@@ -119,15 +119,15 @@ let
 
     # check normalized mean squared error
     approximate_spec = mc2sp(sp2mc(spec, 25, α), α, fftlen)
-    nmse25 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
+    nmse25 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
     @test nmse25 <= 0.06
 
     approximate_spec = mc2sp(sp2mc(spec, 30, α), α, fftlen)
-    nmse30 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
+    nmse30 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
     @test nmse30 <= 0.06
 
     approximate_spec = mc2sp(sp2mc(spec, 40, α), α, fftlen)
-    nmse40 = vecnorm(log.(spec) - log.(approximate_spec)) / vecnorm(log.(spec))
+    nmse40 = norm(log.(spec) - log.(approximate_spec)) / norm(log.(spec))
     @test nmse40 <= 0.05
 
     @test nmse25 > nmse30 > nmse40
@@ -154,14 +154,14 @@ end
 # DioOption
 
 let
-    try DioOption(); catch @test false; end
+    try DioOption(); catch; @test false; end
 
     # keyword arguments
-    try DioOption(f0floor=60.0); catch @test false; end
-    try DioOption(f0ceil=600.0); catch @test false; end
-    try DioOption(channels_in_octave=2.0); catch @test false; end
-    try DioOption(period=10.0); catch @test false; end
-    try DioOption(speed=5); catch @test false; end
+    try DioOption(f0floor=60.0); catch; @test false; end
+    try DioOption(f0ceil=600.0); catch; @test false; end
+    try DioOption(channels_in_octave=2.0); catch; @test false; end
+    try DioOption(period=10.0); catch; @test false; end
+    try DioOption(speed=5); catch; @test false; end
 
     # f0loor
     @test_throws ArgumentError DioOption(-1,  100, 2.0, 5.0, 11)
@@ -172,14 +172,14 @@ let
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, -1.0, 11)
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 0.0, 11)
     # speed
-    try DioOption(80.0, 640.0, 2.0, 5.0, 1); catch @test false; end
-    try DioOption(80.0, 640.0, 2.0, 5.0, 12); catch @test false; end
+    try DioOption(80.0, 640.0, 2.0, 5.0, 1); catch; @test false; end
+    try DioOption(80.0, 640.0, 2.0, 5.0, 12); catch; @test false; end
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0)
     @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 13)
     # allowed_range
     if WORLD.version >= v"0.2.1-2"
-        try DioOption(allowed_range=0.1); catch @test false; end
-        try DioOption(71.0, 800.0, 2.0, 5.0, 1, 0.0); catch @test false; end
+        try DioOption(allowed_range=0.1); catch; @test false; end
+        try DioOption(71.0, 800.0, 2.0, 5.0, 1, 0.0); catch; @test false; end
         @test_throws ArgumentError DioOption(80.0, 640.0, 2.0, 5.0, 0, -1.0)
     end
 end
@@ -227,7 +227,7 @@ let
 
     decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
 
-    nmse = vecnorm(log.(aperiodicity) - log.(decoded_aperiodicity)) / vecnorm(log.(aperiodicity))
+    nmse = norm(log.(aperiodicity) - log.(decoded_aperiodicity)) / norm(log.(aperiodicity))
     @test nmse <= 0.002
 end
 
@@ -245,7 +245,7 @@ function test_code_spectral_envelope(dim, tol)
 
     decoded_spectrogram = decode_spectral_envelope(coded_spectrogram, fs, fftsize)
 
-    nmse = vecnorm(log.(spectrogram) - log.(decoded_spectrogram)) / vecnorm(log.(spectrogram))
+    nmse = norm(log.(spectrogram) - log.(decoded_spectrogram)) / norm(log.(spectrogram))
     @test nmse <= tol
 end
 
