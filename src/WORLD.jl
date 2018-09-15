@@ -1,5 +1,3 @@
-__precompile__()
-
 """
 A lightweitht julia wrapper for [WORLD](https://github.com/mmorise/World),
 a high-quality speech analysis, manipulation and synthesis system.
@@ -13,8 +11,7 @@ and re-synthesize a speech signal from these paramters. Please see the project
 page for more details on the WORLD.
 
 !!! note
-    WORLD.jl is based on a fork of WORLD ([r9y9/World-cmake](\
-    https://github.com/r9y9/World-cmake)).
+    WORLD.jl is based on a fork of WORLD ([r9y9/World-cmake](https://github.com/r9y9/World-cmake)).
 
 [https://github.com/r9y9/WORLD.jl](https://github.com/r9y9/WORLD.jl)
 
@@ -123,8 +120,7 @@ decoded_aperiodicity = decode_aperiodicity(coded_aperiodicity, fs)
 ![](assets/decoded_aperiodicity.png)
 
 For the complete code of visualizations shown above, please check
-[the IJulia notebook](\
-    http://nbviewer.jupyter.org/github/r9y9/WORLD.jl/blob/master/docs/src/assets/WORLD-demo.ipynb).
+[the IJulia notebook](http://nbviewer.jupyter.org/github/r9y9/WORLD.jl/blob/master/docs/src/assets/WORLD-demo.ipynb).
 
 ## Exports
 
@@ -156,7 +152,7 @@ try
     # function GetWORLDVersion was added in v0.2.1-2
     versionstr = unsafe_string(convert(Ptr{UInt8},
         ccall((:GetWORLDVersion, libworld), Ptr{Cchar}, ())))
-    global const version = convert(VersionNumber, versionstr)
+    global const version = VersionNumber(versionstr)
 catch e
     try
         ccall((:GetFFTSizeForStar, libworld), Cint, (Cint,), 48000)

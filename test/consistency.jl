@@ -6,11 +6,11 @@
 # WORLD.
 
 using WORLD
-using Base.Test
+using Test, DelimitedFiles
 
 @assert WORLD.version >= v"0.3.0"
 
-info("Check consistency with the original WORLD")
+@info("Check consistency with the original WORLD")
 
 x = vec(readdlm(joinpath(dirname(@__FILE__), "data", "x.txt")))
 
@@ -32,13 +32,13 @@ spectrogram_org = readdlm(joinpath(dirname(@__FILE__), "data", "spectrogram.txt"
 
 println("Maximum error in CheapTrick is $(maximum(abs.(spectrogram - spectrogram_org)))")
 @test size(spectrogram) == size(spectrogram_org)
-@test isapprox(spectrogram, spectrogram_org, atol=1.0e-10)
+@test isapprox(spectrogram, spectrogram_org, atol=1.0e-9)
 
 aperiodicity = d4c(x, fs, timeaxis, f0; opt=D4COption())
 aperiodicity_org = readdlm(joinpath(dirname(@__FILE__), "data", "aperiodicity.txt"))'
 println("Maximum error in D4C is $(maximum(abs.(aperiodicity-aperiodicity_org)))")
 @test size(aperiodicity) == size(aperiodicity)
-@test isapprox(aperiodicity, aperiodicity_org, atol=1.0e-10)
+@test isapprox(aperiodicity, aperiodicity_org, atol=1.0e-6)
 
 # Synthesis
 y_length = trunc(Int, ((length(f0)-1)*period/1000 * fs) + 1)
