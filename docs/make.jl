@@ -3,9 +3,8 @@ using Documenter, WORLD
 makedocs(
     modules = [WORLD],
     clean   = false,
-    format   = :html,
     sitename = "WORLD.jl",
-    pages = Any["Home" => "index.md"],
+    pages = ["Home" => "index.md"],
 )
 
 deploydocs(
